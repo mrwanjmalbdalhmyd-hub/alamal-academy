@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأمل للتدريب</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:Tahoma}
+body{margin:0;background:#0d0d0d;color:#fff}
+#loginScreen{position:fixed;inset:0;background:#000;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:15px}
+#loginScreen{z-index:998;display:none}
+.loginBox h1{color:#FFD700;font-size:32px;text-shadow:0 0 20px #FFD700}
+.loginBox{background:#1a1a1a;border:2px solid #FFD700;border-radius:14px;padding:18px;width:100%;max-width:380px}
+header{background:#000;border-bottom:3px solid #FFD700;padding:12px;text-align:center;color:#FFD700;font-size:24px;font-weight:bold}
+.wrap{padding:10px;max-width:1100px;margin:auto}
+.menu{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.menu button{padding:18px 5px;background:linear-gradient(145deg,#ffe45c,#b8860b);border:2px solid #fff;border-radius:12px;font-weight:bold}
+.card{background:#1a1a1a;border:1px solid #FFD700;border-radius:12px;padding:14px;display:none;margin-top:12px}
+.card.active{display:block}
+h3{color:#FFD700}
+input,select,button,textarea{width:100%;padding:11px;margin:5px 0;border-radius:8px;border:1px solid #666;font-size:15px}
+button{background:#FFD700;color:#000;font-weight:bold;border:none}
+.blue{background:#2196F3;color:#fff}.red{background:#e53935;color:#fff}.green{background:#43A047;color:#fff}.orange{background:#FB8C00;color:#fff}
+table{width:100%;border-collapse:collapse;background:#fff;color:#000}
+th,td{border:1.5px solid #000;padding:6px;text-align:center;font-size:12px}
+th{background:#FFD700}
+.photo{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100}
+.modal.open{display:flex}
+.modalBox{background:#1e1e1e;border:2px solid #FFD700;border-radius:14px;padding:15px;width:92%;max-width:420px;max-height:90vh;overflow:auto}
+#bigMsg{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;align-items:center;justify-content:center;z-index:200;text-align:center;color:#FFD700;font-size:26px;font-weight:bold}
+#fee_alert{background:#4a0000;border:2px solid #e53935;border-radius:10px;padding:10px;display:none}
+video{width:100%;border:2px solid #FFD700;border-radius:10px}
+pre{background:#000;color:#0f0;padding:10px;overflow:auto;font-size:11px;text-align:left;direction:ltr}
+@media print{.menu,header,.no-print{display:none!important}.card{display:block!important;border:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div id="loginScreen">
+<div class="loginBox">
+<h1>تسجيل الدخول</h1>
+<input id="login_user" placeholder="اسم المستخدم (اليوزر)">
+<input id="login_pass" type="password" placeholder="كلمة المرور">
+<button class="green" onclick="doLogin()">دخول بيوزري</button>
+<button class="blue" onclick="createFromLogin()">إنشاء يوزر جديد (هيفتح فاضي من غير بيانات أي يوزر تاني)</button>
+<hr>
+<p style="color:#FFD700">يوزرك على جهاز تاني؟ افتحه من ملفه</p>
+<input type="file" id="importLogin" accept=".json">
+</div>
+</div>
+<div id="bigMsg"></div>
+<header id="academyTitle">الأمل للتدريب</header>
+<div id="userBar" style="text-align:center;background:#111;padding:8px;border-bottom:1px solid #FFD700">غير مسجل دخول</div>
+<div class="wrap">
+<div class="menu">
+<button onclick="showSec('general')">شعبة عامة</button>
+<button onclick="showSec('labs')">تحاليل طبية</button>
+<button onclick="showSec('nursing')">تمريض</button>
+<button onclick="showSec('affairs')">شئون طلاب</button>
+<button onclick="showSec('fees')">قسم الأقساط</button>
+<button onclick="openSettings()">الاعدادات</button>
+</div>
+<div id="general" class="card">
+<h3>طلاب شعبة عامة</h3>
+<button class="blue no-print" onclick="window.print()">طباعة</button>
+<button class="green no-print" onclick="exportTable('tbl_general')">اكسل</button>
+<div style="overflow:auto"><table id="tbl_general"><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>القومي</th><th>الجنس</th><th>الميلاد</th><th>العنوان</th><th>الرمز</th><th class="no-print">تعديل</th></tr></thead><tbody id="tb_general"></tbody></table></div>
+<h3>جدول المحاضرات</h3>
+<input id="lt_general" placeholder="اسم المحاضرة"><input id="ld_general" type="date"><button onclick="addLecture('general')">إضافة محاضرة</button>
+<table><thead><tr><th>التاريخ</th><th>المحاضرة</th><th class="no-print">حذف</th></tr></thead><tbody id="lec_general"></tbody></table>
+</div>
+<div id="labs" class="card">
+<h3>طلاب تحاليل طبية</h3>
+<button class="blue no-print" onclick="window.print()">طباعة</button>
+<button class="green no-print" onclick="exportTable('tbl_labs')">اكسل</button>
+<div style="overflow:auto"><table id="tbl_labs"><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>القومي</th><th>الجنس</th><th>الميلاد</th><th>العنوان</th><th>الرمز</th><th class="no-print">تعديل</th></tr></thead><tbody id="tb_labs"></tbody></table></div>
+<h3>جدول المحاضرات</h3>
+<input id="lt_labs" placeholder="اسم المحاضرة"><input id="ld_labs" type="date"><button onclick="addLecture('labs')">إضافة محاضرة</button>
+<table><thead><tr><th>التاريخ</th><th>المحاضرة</th><th class="no-print">حذف</th></tr></thead><tbody id="lec_labs"></tbody></table>
+</div>
+<div id="nursing" class="card">
+<h3>طلاب تمريض</h3>
+<button class="blue no-print" onclick="window.print()">طباعة</button>
+<button class="green no-print" onclick="exportTable('tbl_nursing')">اكسل</button>
+<div style="overflow:auto"><table id="tbl_nursing"><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>القومي</th><th>الجنس</th><th>الميلاد</th><th>العنوان</th><th>الرمز</th><th class="no-print">تعديل</th></tr></thead><tbody id="tb_nursing"></tbody></table></div>
+<h3>جدول المحاضرات</h3>
+<input id="lt_nursing" placeholder="اسم المحاضرة"><input id="ld_nursing" type="date"><button onclick="addLecture('nursing')">إضافة محاضرة</button>
+<table><thead><tr><th>التاريخ</th><th>المحاضرة</th><th class="no-print">حذف</th></tr></thead><tbody id="lec_nursing"></tbody></table>
+</div>
+<div id="affairs" class="card active">
+<h3>شئون طلاب</h3>
+<button class="green" onclick="openModal()">إضافة طالب جديد</button>
+<button class="blue" onclick="startCamera()">فتح كاميرا الموبايل لمسح الرمز</button>
+<video id="cam" playsinline style="display:none"></video>
+<canvas id="camCanvas" style="display:none"></canvas>
+<label class="no-print">مسح الرمز من صورة</label>
+<input type="file" id="qrFile" accept="image/*">
+<button class="red" onclick="resetToday()">تصفير حضور وغياب اليوم</button>
+<button class="green" onclick="exportUSB()">تصدير حسابي للنقل بالـ USB</button>
+<label>استيراد حساب من ملف USB</label>
+<input type="file" id="importUSB" accept=".json">
+<input id="searchBox" placeholder="ابحث بالاسم أو الفون أو الكود أو القومي أو العنوان" oninput="render()">
+<div style="overflow:auto"><table><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الشعبة</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>العنوان</th><th>الرمز</th><th class="no-print">إجراء</th></tr></thead><tbody id="tb_affairs"></tbody></table></div>
+<h3>تقرير طالب</h3>
+<select id="reportSel" onchange="report()"></select>
+<div id="reportBox" style="background:#000;border:1px solid #FFD700;padding:10px;border-radius:8px">اختر طالب</div>
+<button class="blue" onclick="window.print()">طباعة التقرير</button>
+<button class="green" onclick="sendParentWhatsApp()">إرسال تقرير ولي الأمر واتساب</button>
+</div>
+<div id="fees" class="card">
+<h3>قسم الأقساط</h3>
+<div id="fee_alert"></div>
+<input type="hidden" id="editFeeId">
+<select id="fee_student"></select>
+<input id="fee_total" type="number" placeholder="القسط كامل">
+<input id="fee_paid" type="number" placeholder="دفع كام">
+<label>تاريخ القسط القادم</label>
+<input id="fee_next" type="date">
+<button class="green" onclick="addFee()">حفظ / تعديل القسط</button>
+<input id="fee_search" placeholder="ابحث في الأقساط باسم الطالب أو فونه" oninput="renderFees()">
+<button class="blue no-print" onclick="window.print()">طباعة جدول الأقساط</button>
+<div style="overflow:auto"><table id="tbl_fees"><thead><tr><th>مسلسل</th><th>اسم الطالب</th><th>رقم الفون</th><th>القسط كامل</th><th>دفع كام</th><th>باقي كام</th><th>موعد القسط القادم</th><th class="no-print">إجراء</th></tr></thead><tbody id="tb_fees"></tbody></table></div>
+</div>
+<div id="settings" class="card">
+<h3>الاعدادات والحساب</h3>
+<label>اسم الأكاديمية</label><input id="set_name">
+<label>لون الخلفية</label><input type="color" id="set_bg">
+<button class="blue" onclick="exportUSB()">تصدير حسابي (ملف حسابي) للنقل بالـ USB لأي جهاز</button>
+<button onclick="logout()">تسجيل خروج - هيرجع لشاشة اليوزر</button>
+<hr>
+<h3>قاعدة البيانات</h3>
+<pre id="dbView">اضغط عرض</pre>
+<button class="blue" onclick="showDB()">عرض قاعدة بيانات يوزري</button>
+<hr>
+<label>كلمة مرور الاعدادات جديدة</label><input id="set_pass" placeholder="اتركها فارغة">
+<button class="green" onclick="saveSettings()">حفظ الاعدادات</button>
+<button class="red" onclick="clearMyData()">مسح بيانات يوزري بس</button>
+</div>
+</div>
+<div id="modal" class="modal">
+<div class="modalBox">
+<h3>بيانات الطالب</h3>
+<input type="hidden" id="editId">
+<input id="f_name" placeholder="الاسم بالكامل">
+<select id="f_div"><option value="">اختر الشعبة</option><option value="general">شعبة عامة</option><option value="labs">تحاليل طبية</option><option value="nursing">تمريض</option></select>
+<input id="f_band" placeholder="الفرقة">
+<input id="f_phone" placeholder="فون الطالب">
+<input id="f_guardian" placeholder="اسم ولي الأمر">
+<input id="f_parent" placeholder="فون ولي الأمر">
+<input id="f_nid" placeholder="الرقم القومي">
+<select id="f_gender"><option value="">الجنس</option><option>ذكر</option><option>أنثى</option></select>
+<label>تاريخ الميلاد</label><input id="f_dob" type="date">
+<textarea id="f_address" placeholder="العنوان بالتفصيل"></textarea>
+<label>الصورة</label><input id="f_photo" type="file" accept="image/*">
+<img id="prev" style="width:80px;height:80px;border-radius:50%;display:none;margin:auto;object-fit:cover">
+<button class="green" onclick="saveStudent()">حفظ وتوليد الرمز</button>
+<button onclick="closeModal()">إغلاق</button>
+</div>
+</div><script>
+function emptyData(){return {students:[],lectures:{general:[],labs:[],nursing:[]},fees:[],attendance:[],settings:{name:"الأمل للتدريب",bg:"#0d0d0d",pass:"1234"}};}
+var USERS={}; try{var s=localStorage.getItem('alamal_users_v4');if(s)USERS=JSON.parse(s);}catch(e){}
+var CUR=""; var DB=emptyData(); var photoData="", scanning=false;
+function saveUsers(){localStorage.setItem('alamal_users_v4',JSON.stringify(USERS));}
+function saveDB(){ if(!CUR)return; USERS[CUR].data=DB; saveUsers(); updateUserBar(); }
+function updateUserBar(){document.getElementById('userBar').textContent=CUR?("مسجل دخول: "+CUR+" - بياناتك لوحدك"):"غير مسجل دخول";}
+function checkLogin(){ document.getElementById('loginScreen').style.display=(sessionStorage.getItem('alamal_logged')&&CUR)?'none':'flex'; if(sessionStorage.getItem('alamal_logged')){var u=sessionStorage.getItem('alamal_logged'); if(USERS[u]){CUR=u; DB=USERS[u].data; document.getElementById('loginScreen').style.display='none'; applySettings(); render(); updateUserBar(); return;}} document.getElementById('loginScreen').style.display='flex'; }
+function doLogin(){var u=document.getElementById('login_user').value.trim();var p=document.getElementById('login_pass').value.trim(); if(!USERS[u]){alert("اليوزر ده مش موجود. لو أول مرة دوس إنشاء يوزر جديد");return;} if(USERS[u].pass!==p){alert("الباسورد غلط");return;} CUR=u; DB=USERS[u].data; sessionStorage.setItem('alamal_logged',u); document.getElementById('loginScreen').style.display='none'; applySettings(); render(); updateUserBar(); alert("أهلاً "+u+" - دي بياناتك انت بس"); }
+function createFromLogin(){var u=document.getElementById('login_user').value.trim();var p=document.getElementById('login_pass').value.trim(); if(!u||!p){alert("اكتب يوزر وباسورد");return;} if(USERS[u]){alert("اليوزر ده موجود، دوس دخول بيوزري");return;} USERS[u]={pass:p,data:emptyData()}; CUR=u; DB=USERS[u].data; saveUsers(); sessionStorage.setItem('alamal_logged',u); document.getElementById('loginScreen').style.display='none'; applySettings(); render(); updateUserBar(); alert("تم إنشاء يوزر جديد: "+u+"\nالبرنامج فاضي ليك، مفيش أي بيانات من أي يوزر تاني"); }
+document.getElementById('importLogin').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var pkg=JSON.parse(ev.target.result); var u=prompt("اليوزر بتاع الملف ده"); var p=prompt("الباسورد"); if(pkg.user===u&&pkg.pass===p){ USERS[u]={pass:p,data:pkg.data}; CUR=u; DB=pkg.data; saveUsers(); sessionStorage.setItem('alamal_logged',u); document.getElementById('loginScreen').style.display='none'; applySettings(); render(); alert("تم فتح حساب "+u+" على الجهاز ده بكل بياناته"); }else alert("اليوزر أو الباسورد غلط");}catch(err){alert("ملف غير صالح");}};r.readAsText(f);});
+function showSec(id){document.querySelectorAll('.card').forEach(function(c){c.classList.remove('active')});document.getElementById(id).classList.add('active');render();}
+function openSettings(){var p=prompt("كلمة مرور الاعدادات");if(p===DB.settings.pass)showSec('settings');else if(p!==null)alert("خاطئة");}
+function divName(v){return v==='general'?'شعبة عامة':v==='labs'?'تحاليل طبية':'تمريض';}
+function makeQR(el,code){el.innerHTML="";try{var qr=qrcode(0,'M');qr.addData(code);qr.make();el.innerHTML=qr.createSvgTag(3,6);var svg=el.querySelector('svg');if(svg){svg.style.width='90px';svg.style.height='90px';svg.style.background='#fff';}}catch(e){el.textContent=code;}}
+function printQR(code,name){var w=window.open("","_blank");w.document.write('<html lang="ar" dir="rtl"><body style="text-align:center"><h3>'+DB.settings.name+'</h3><p>'+name+'</p><div id="q"></div><p>'+code+'</p><script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"><\/script><script>var qr=qrcode(0,"M");qr.addData("'+code+'");qr.make();document.getElementById("q").innerHTML=qr.createSvgTag(6,10);setTimeout(function(){window.print()},600)<\/script></body></html>');w.document.close();}
+function openModal(){document.getElementById('editId').value="";document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('f_photo').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){photoData=ev.target.result;var im=document.getElementById('prev');im.src=photoData;im.style.display='block';};r.readAsDataURL(f);});
+function editStudent(id){var s=DB.students.find(function(x){return x.id===id});if(!s)return;document.getElementById('editId').value=id;document.getElementById('f_name').value=s.name||"";document.getElementById('f_div').value=s.division||"";document.getElementById('f_band').value=s.band||"";document.getElementById('f_phone').value=s.phone||"";document.getElementById('f_guardian').value=s.guardian||"";document.getElementById('f_parent').value=s.parent||"";document.getElementById('f_nid').value=s.nid||"";document.getElementById('f_gender').value=s.gender||"";document.getElementById('f_dob').value=s.dob||"";document.getElementById('f_address').value=s.address||"";photoData=s.photo||"";var im=document.getElementById('prev');if(photoData){im.src=photoData;im.style.display='block';}else im.style.display='none';document.getElementById('modal').classList.add('open');}
+function saveStudent(){var name=document.getElementById('f_name').value.trim();var div=document.getElementById('f_div').value;if(!name||!div){alert("اكتب الاسم والشعبة");return;}var eid=document.getElementById('editId').value;var data={name:name,division:div,band:document.getElementById('f_band').value,phone:document.getElementById('f_phone').value,guardian:document.getElementById('f_guardian').value,parent:document.getElementById('f_parent').value,nid:document.getElementById('f_nid').value,gender:document.getElementById('f_gender').value,dob:document.getElementById('f_dob').value,address:document.getElementById('f_address').value,photo:photoData};if(eid){var old=DB.students.find(function(x){return x.id==eid});if(old)Object.assign(old,data);alert("تم التعديل");}else{data.id=Date.now();data.code="AM"+Date.now().toString().slice(-6);DB.students.push(data);alert("تم الحفظ");}saveDB();closeModal();render();}
+function delStudent(id){if(confirm("حذف؟")){DB.students=DB.students.filter(function(s){return s.id!==id});saveDB();render();}}
+function fillDiv(div){var tb=document.getElementById('tb_'+div);tb.innerHTML="";DB.students.filter(function(s){return s.division===div}).forEach(function(s){var tr=document.createElement('tr');tr.innerHTML='<td>'+(s.photo?'<img class="photo" src="'+s.photo+'">':'-')+'</td><td>'+s.code+'</td><td>'+s.name+'</td><td>'+(s.band||'-')+'</td><td>'+(s.phone||'-')+'</td><td>'+(s.guardian||'-')+'</td><td>'+(s.parent||'-')+'</td><td>'+(s.nid||'-')+'</td><td>'+(s.gender||'-')+'</td><td>'+(s.dob||'-')+'</td><td>'+(s.address||'-')+'</td>';var qrtd=document.createElement('td');makeQR(qrtd,s.code);var b=document.createElement('button');b.className='blue no-print';b.textContent='طباعة الرمز';b.onclick=function(){printQR(s.code,s.name)};qrtd.appendChild(document.createElement('br'));qrtd.appendChild(b);tr.appendChild(qrtd);var etd=document.createElement('td');etd.className='no-print';etd.innerHTML='<button class="green" onclick="editStudent('+s.id+')">تعديل</button>';tr.appendChild(etd);tb.appendChild(tr);});var lt=document.getElementById('lec_'+div);lt.innerHTML="";DB.lectures[div].forEach(function(l){var tr=document.createElement('tr');tr.innerHTML='<td>'+l.date+'</td><td>'+l.title+'</td><td class="no-print"><button class="red" onclick="delLecture(\''+div+'\','+l.id+')">حذف</button></td>';lt.appendChild(tr);});}
+function render(){
+ ['general','labs','nursing'].forEach(fillDiv);
+ var q=(document.getElementById('searchBox').value||"").toLowerCase().trim();
+ var tb=document.getElementById('tb_affairs');tb.innerHTML="";
+ DB.students.forEach(function(s){
+  var all=(s.name+" "+s.phone+" "+s.parent+" "+(s.guardian||"")+" "+s.code+" "+s.nid+" "+s.address+" "+s.band).toLowerCase();
+  if(q&&all.indexOf(q)===-1)return;
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td>'+(s.photo?'<img class="photo" src="'+s.photo+'">':'-')+'</td><td>'+s.code+'</td><td>'+s.name+'</td><td>'+divName(s.division)+'</td><td>'+(s.band||'-')+'</td><td>'+(s.phone||'-')+'</td><td>'+(s.guardian||'-')+'</td><td>'+(s.parent||'-')+'</td><td>'+(s.address||'-')+'</td>';
+  var qrtd=document.createElement('td');makeQR(qrtd,s.code);tr.appendChild(qrtd);
+  var atd=document.createElement('td');atd.className='no-print';
+  atd.innerHTML='<button class="green" onclick="attend('+s.id+',\'present\')">حضور</button><button class="orange" onclick="attend('+s.id+',\'absent\')">غياب</button><button onclick="editStudent('+s.id+')">تعديل</button><button class="red" onclick="delStudent('+s.id+')">حذف</button>';
+  var pb=document.createElement('button');pb.className='blue';pb.textContent='طباعة الرمز';pb.onclick=function(){printQR(s.code,s.name)};atd.appendChild(pb);
+  tr.appendChild(atd);tb.appendChild(tr);
+ });
+ var sel=document.getElementById('reportSel');var old=sel.value;sel.innerHTML='<option value="">اختر طالب</option>';
+ var fsel=document.getElementById('fee_student');var oldf=fsel.value;fsel.innerHTML='<option value="">اختر طالب للأقساط</option>';
+ DB.students.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.code+" - "+s.name;sel.appendChild(o);var o2=document.createElement('option');o2.value=s.id;o2.textContent=s.name+" - "+(s.phone||"");fsel.appendChild(o2);});
+ if(old)sel.value=old; if(oldf)fsel.value=oldf;
+ renderFees();
+}
+function addLecture(div){var t=document.getElementById('lt_'+div).value;var d=document.getElementById('ld_'+div).value;if(!t||!d){alert("اكتب المحاضرة والتاريخ");return;}DB.lectures[div].push({id:Date.now(),title:t,date:d});saveDB();render();}
+function delLecture(div,id){DB.lectures[div]=DB.lectures[div].filter(function(x){return x.id!==id});saveDB();render();}
+function attend(id,status){var s=DB.students.find(function(x){return x.id===id});if(!s)return;var today=new Date().toISOString().slice(0,10);DB.attendance=DB.attendance.filter(function(a){return !(a.studentId===id&&a.date===today)});var time=new Date().toLocaleTimeString('ar-EG');DB.attendance.push({studentId:id,date:today,time:time,status:status});saveDB();var label=status==='present'?'حضر اليوم':'غائب اليوم';var bm=document.getElementById('bigMsg');bm.innerHTML=label+"<br>"+s.name+"<br>"+time;bm.style.display='flex';try{var u=new SpeechSynthesisUtterance(label+" الطالب "+s.name);u.lang='ar-EG';if(status==='present')speechSynthesis.speak(u);}catch(e){}setTimeout(function(){bm.style.display='none';},3500);report();}
+function startCamera(){var video=document.getElementById('cam');video.style.display='block';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert("الكاميرا مش هتشتغل من مدير الملفات، استخدم مسح الرمز من صورة");return;}navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(stream){video.srcObject=stream;video.play();scanning=true;var canvas=document.getElementById('camCanvas');var ctx=canvas.getContext('2d');function tick(){if(!scanning)return;if(video.readyState===video.HAVE_ENOUGH_DATA){canvas.width=video.videoWidth;canvas.height=video.videoHeight;ctx.drawImage(video,0,0,canvas.width,canvas.height);var img=ctx.getImageData(0,0,canvas.width,canvas.height);var qr=jsQR(img.data,img.width,img.height);if(qr){var s=DB.students.find(function(x){return x.code===qr.data.trim()});if(s){attend(s.id,'present');stream.getTracks().forEach(function(t){t.stop()});video.style.display='none';scanning=false;return;}}}requestAnimationFrame(tick);}tick();}).catch(function(){alert("اسمح بالكاميرا أو استخدم مسح من صورة")});}
+document.getElementById('qrFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var img=new Image();img.onload=function(){var c=document.getElementById('camCanvas');c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');ctx.drawImage(img,0,0);var data=ctx.getImageData(0,0,c.width,c.height);var qr=jsQR(data.data,data.width,data.height);if(qr){var s=DB.students.find(function(x){return x.code===qr.data.trim()});if(s)attend(s.id,'present');else alert("الكود غير مسجل");}else alert("لا يوجد رمز واضح");};img.src=URL.createObjectURL(f);});
+function resetToday(){var t=new Date().toISOString().slice(0,10);DB.attendance=DB.attendance.filter(function(a){return a.date!==t});saveDB();alert("تم التصفير");}
+function counts(id){var list=DB.attendance.filter(function(a){return a.studentId==id});return {present:list.filter(function(a){return a.status!=='absent'}).length,absent:list.filter(function(a){return a.status==='absent'}).length,list:list};}
+function report(){var id=document.getElementById('reportSel').value;var box=document.getElementById('reportBox');if(!id){box.innerHTML="اختر طالب";return;}var c=counts(id);box.innerHTML="حضر: "+c.present+" مرة<br>غاب: "+c.absent+" مرة<br><hr>"+c.list.map(function(a){return a.date+" "+a.time+" - "+(a.status==='absent'?'غياب':'حضور')}).join("<br>");}
+function sendParentWhatsApp(){var id=document.getElementById('reportSel').value;if(!id){alert("اختر طالب الأول من التقرير");return;}var s=DB.students.find(function(x){return x.id==id});var c=counts(id);var myFees=DB.fees.filter(function(f){return f.studentId==id});var remain=myFees.reduce(function(sum,f){return sum+(f.total-f.paid)},0);var next=myFees.length?myFees[myFees.length-1].nextDate||"-":"-";var phone=(s.parent||"").replace(/[^0-9]/g,"");if(phone.startsWith("0"))phone="2"+phone;var msg="تقرير مركز الأمل للتدريب\nالطالب: "+s.name+"\nحضر: "+c.present+" مرة\nغاب: "+c.absent+" مرة\nالباقي عليه: "+remain+" جنيه\nموعد القسط القادم: "+next;window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg),"_blank");}
+function addFee(){var sid=document.getElementById('fee_student').value;var total=parseFloat(document.getElementById('fee_total').value||0);var paid=parseFloat(document.getElementById('fee_paid').value||0);var next=document.getElementById('fee_next').value;if(!sid){alert("اختر الطالب");return;}var eid=document.getElementById('editFeeId').value;if(eid){var old=DB.fees.find(function(x){return x.id==eid});if(old){old.studentId=parseInt(sid);old.total=total;old.paid=paid;old.nextDate=next;}document.getElementById('editFeeId').value="";alert("تم تعديل القسط");}else{DB.fees.push({id:Date.now(),studentId:parseInt(sid),total:total,paid:paid,nextDate:next});alert("تم حفظ القسط");}saveDB();renderFees();}
+function editFee(id){var f=DB.fees.find(function(x){return x.id===id});if(!f)return;document.getElementById('editFeeId').value=id;document.getElementById('fee_student').value=f.studentId;document.getElementById('fee_total').value=f.total;document.getElementById('fee_paid').value=f.paid;document.getElementById('fee_next').value=f.nextDate||"";window.scrollTo(0,0);alert("عدّل القسط فوق ودوس حفظ / تعديل القسط");}
+function renderFees(){var tb=document.getElementById('tb_fees');if(!tb)return;var q=(document.getElementById('fee_search')?document.getElementById('fee_search').value:"").toLowerCase().trim();tb.innerHTML="";var today=new Date();today.setHours(0,0,0,0);var alerts=[];DB.fees.forEach(function(f){if(!f.nextDate)return;var s=DB.students.find(function(x){return x.id===f.studentId});if(!s)return;var d=new Date(f.nextDate);var diff=Math.ceil((d-today)/86400000);if(diff<0)alerts.push("متأخر: "+s.name+" - كان معاده "+f.nextDate+" - باقي "+(f.total-f.paid));else if(diff<=7)alerts.push("قرب: "+s.name+" - معاده "+f.nextDate+" - باقي "+(f.total-f.paid));});var ab=document.getElementById('fee_alert');if(alerts.length){ab.style.display='block';ab.innerHTML="<b>تنبيه الأقساط القادمة والمتأخرة:</b><br>"+alerts.join("<br>");}else{ab.style.display='none';ab.innerHTML="";}var i=0;DB.fees.forEach(function(f){var s=DB.students.find(function(x){return x.id===f.studentId});if(!s)return;var all=(s.name+" "+(s.phone||"")).toLowerCase();if(q&&all.indexOf(q)===-1)return;i++;var remain=f.total-f.paid;var tr=document.createElement('tr');tr.innerHTML='<td>'+i+'</td><td>'+s.name+'</td><td>'+(s.phone||'-')+'</td><td>'+f.total+'</td><td>'+f.paid+'</td><td>'+remain+'</td><td>'+(f.nextDate||'-')+'</td><td class="no-print"><button class="green" onclick="editFee('+f.id+')">تعديل</button><button class="red" onclick="delFee('+f.id+')">حذف</button></td>';tb.appendChild(tr);});}
+function delFee(id){if(confirm("حذف القسط؟")){DB.fees=DB.fees.filter(function(x){return x.id!==id});saveDB();renderFees();}}
+function exportTable(id){var tbl=document.getElementById(id);var blob=new Blob(['\ufeff<html><meta charset="UTF-8"><body>'+tbl.outerHTML+'</body></html>'],{type:'application/vnd.ms-excel'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='جدول.xls';a.click();}
+function exportUSB(){if(!CUR){alert("ادخل بيوزرك الأول");return;}var pkg={user:CUR,pass:USERS[CUR].pass,data:DB};var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(pkg)],{type:'application/json'}));a.download='حسابي_'+CUR+'.json';a.click();alert("نزل ملف حسابي_"+CUR+".json - انقله بالـ USB، وعلى أي جهاز افتحه من شاشة الدخول بنفس اليوزر والباسورد");}
+function handleImportUSB(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var pkg=JSON.parse(ev.target.result);USERS[pkg.user]={pass:pkg.pass,data:pkg.data};CUR=pkg.user;DB=pkg.data;saveUsers();sessionStorage.setItem('alamal_logged',CUR);applySettings();render();alert("تم استيراد حساب "+CUR);}catch(err){alert("ملف غير صالح")}};r.readAsText(f);}
+document.getElementById('importUSB').addEventListener('change',handleImportUSB);
+function showDB(){document.getElementById('dbView').textContent=JSON.stringify({user:CUR,students:DB.students.length,fees:DB.fees.length,attendance:DB.attendance.length,tables:["students","fees","attendance","lectures","settings"]},null,2);}
+function logout(){sessionStorage.removeItem('alamal_logged');CUR="";DB=emptyData();updateUserBar();document.getElementById('loginScreen').style.display='flex';}
+function saveSettings(){DB.settings.name=document.getElementById('set_name').value||DB.settings.name;DB.settings.bg=document.getElementById('set_bg').value;var np=document.getElementById('set_pass').value.trim();if(np)DB.settings.pass=np;saveDB();applySettings();alert("تم الحفظ");}
+function applySettings(){document.body.style.background=DB.settings.bg;document.getElementById('academyTitle').textContent=DB.settings.name;document.getElementById('set_name').value=DB.settings.name;document.getElementById('set_bg').value=DB.settings.bg;}
+function clearMyData(){if(confirm("مسح بيانات يوزرك بس؟")){DB=emptyData();saveDB();render();alert("تم مسح بياناتك لوحدك");}}
+applySettings();updateUserBar();checkLogin();if(CUR)render();
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBSXqnQLZRZgwa4K5as1Nj_GXjgs8h1z1k",
+  authDomain: "academy-attendance-d5a88.firebaseapp.com",
+  projectId: "academy-attendance-d5a88",
+  storageBucket: "academy-attendance-d5a88.firebasestorage.app",
+  messagingSenderId: "1049112680070",
+  appId: "1:1049112680070:web:c88a336a62886b4fae2307"
+});
+var cloudDb = firebase.firestore();
+var oldSaveUsers2 = saveUsers;
+saveUsers = function(){
+  oldSaveUsers2();
+  if(CUR && USERS[CUR]){
+    cloudDb.collection("alamal_users").doc(CUR).set(USERS[CUR]).catch(function(e){console.log(e)});
+  }
+};
+function pullFromCloud(){
+  if(!CUR) return;
+  cloudDb.collection("alamal_users").doc(CUR).get().then(function(doc){
+    if(doc.exists){
+      USERS[CUR] = doc.data();
+      DB = USERS[CUR].data;
+      oldSaveUsers2();
+      applySettings(); render(); updateUserBar();
+    } else { saveUsers(); }
+  }).catch(function(e){console.log(e)});
+}
+var oldDoLogin2 = doLogin;
+doLogin = function(){
+  var inputs = document.querySelectorAll('#loginScreen input');
+  var u = inputs[0] ? inputs[0].value.trim() : "";
+  if(u && !USERS[u]){
+    cloudDb.collection("alamal_users").doc(u).get().then(function(doc){
+      if(doc.exists){
+        USERS[u] = doc.data();
+        oldSaveUsers2();
+        oldDoLogin2();
+        setTimeout(pullFromCloud, 600);
+      } else {
+        oldDoLogin2();
+      }
+    }).catch(function(e){ console.log(e); oldDoLogin2(); });
+  } else {
+    oldDoLogin2();
+    setTimeout(pullFromCloud, 600);
+  }
+};
+var oldCreate2 = createFromLogin;
+createFromLogin = function(){ oldCreate2(); setTimeout(saveUsers, 600); };
+setInterval(function(){ if(CUR) pullFromCloud(); }, 10000);
+setTimeout(pullFromCloud, 1500);
+console.log("Firebase academy-attendance-d5a88 Connected");
+</script>
+</body>
+</html>
