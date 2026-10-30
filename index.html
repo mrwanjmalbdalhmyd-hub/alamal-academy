@@ -1,286 +1,1239 @@
 <!DOCTYPE html>
+<!--
+  منظومة الأمل للتدريب
+  ملف الواجهة الرئيسي (HTML / CSS / JavaScript)
+  الأقسام موضحة بالتعليقات لتسهيل التطوير والصيانة.
+  تنبيه: بيانات التطبيق تُخزن محليًا في متصفح الجهاز.
+-->
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الأمل للتدريب</title>
+<title>منظومة الأمل للتدريب</title>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <style>
-*{box-sizing:border-box;font-family:Tahoma}
-body{margin:0;background:#0d0d0d;color:#fff}
-#loginScreen{position:fixed;inset:0;background:#000;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:15px}
-#loginScreen{z-index:998;display:none}
-.loginBox h1{color:#FFD700;font-size:32px;text-shadow:0 0 20px #FFD700}
-.loginBox{background:#1a1a1a;border:2px solid #FFD700;border-radius:14px;padding:18px;width:100%;max-width:380px}
-header{background:#000;border-bottom:3px solid #FFD700;padding:12px;text-align:center;color:#FFD700;font-size:24px;font-weight:bold}
-.wrap{padding:10px;max-width:1100px;margin:auto}
-.menu{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.menu button{padding:18px 5px;background:linear-gradient(145deg,#ffe45c,#b8860b);border:2px solid #fff;border-radius:12px;font-weight:bold}
-.card{background:#1a1a1a;border:1px solid #FFD700;border-radius:12px;padding:14px;display:none;margin-top:12px}
-.card.active{display:block}
-h3{color:#FFD700}
-input,select,button,textarea{width:100%;padding:11px;margin:5px 0;border-radius:8px;border:1px solid #666;font-size:15px}
-button{background:#FFD700;color:#000;font-weight:bold;border:none}
-.blue{background:#2196F3;color:#fff}.red{background:#e53935;color:#fff}.green{background:#43A047;color:#fff}.orange{background:#FB8C00;color:#fff}
-table{width:100%;border-collapse:collapse;background:#fff;color:#000}
-th,td{border:1.5px solid #000;padding:6px;text-align:center;font-size:12px}
-th{background:#FFD700}
-.photo{width:44px;height:44px;border-radius:50%;object-fit:cover}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100}
-.modal.open{display:flex}
-.modalBox{background:#1e1e1e;border:2px solid #FFD700;border-radius:14px;padding:15px;width:92%;max-width:420px;max-height:90vh;overflow:auto}
-#bigMsg{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;align-items:center;justify-content:center;z-index:200;text-align:center;color:#FFD700;font-size:26px;font-weight:bold}
-#fee_alert{background:#4a0000;border:2px solid #e53935;border-radius:10px;padding:10px;display:none}
-video{width:100%;border:2px solid #FFD700;border-radius:10px}
-pre{background:#000;color:#0f0;padding:10px;overflow:auto;font-size:11px;text-align:left;direction:ltr}
-@media print{.menu,header,.no-print{display:none!important}.card{display:block!important;border:none}body{background:#fff}}
+:root {
+  --gold:#D4AF37;
+  --card:#161616;
+  --line:#242424;
+  --blue:#1d4ed8;
+  --green:#15803d
+}
+* {
+  box-sizing:border-box;
+  font-family:Cairo,
+  Tahoma,
+  sans-serif
+}
+body {
+  margin:0;
+  background:#0a0a0a;
+  color:#eee;
+  background-image:radial-gradient(circle at 50% 0%,
+  #1a1a1a 0%,
+  #070707 70%);
+  min-height:100vh
+}
+#loginScreen {
+  position:fixed;
+  inset:0;
+  background:rgba(0,
+  0,
+  0,
+  .88);
+  backdrop-filter:blur(14px);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px
+}
+.loginBox {
+  width:100%;
+  max-width:380px;
+  background:#151515;
+  border:1px solid #2a2a2a;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 20px 60px #000
+}
+.loginBox h2 {
+  color:var(--gold);
+  text-align:center;
+  margin:0 0 14px
+}
+header {
+  background:#0f0f0f;
+  border-bottom:1px solid var(--line);
+  padding:14px;
+  text-align:center;
+  color:var(--gold);
+  font-weight:800;
+  font-size:20px
+}
+#userBar {
+  font-size:12px;
+  text-align:center;
+  color:#777;
+  padding:6px;
+  background:#111
+}
+.wrap {
+  max-width:1200px;
+  margin:auto;
+  padding:12px
+}
+.topBar {
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  padding:8px 0
+}
+.topBar::-webkit-scrollbar {
+  display:none
+}
+.topBar button {
+  flex:1;
+  min-width:110px;
+  padding:10px 6px;
+  font-size:13px;
+  font-weight:700;
+  border-radius:10px;
+  border:1px solid #2a2a2a;
+  background:#1c1c1c;
+  color:#ddd;
+  cursor:pointer;
+  transition:.2s
+}
+.topBar button.activeGold {
+  background:linear-gradient(180deg,
+  #fde68a,
+  #d4af37);
+  color:#111;
+  border-color:#d4af37
+}
+.topBar button:hover {
+  transform:translateY(-1px);
+  border-color:var(--gold)
+}
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
+  display:none;
+  box-shadow:0 10px 30px rgba(0,
+  0,
+  0,
+  .4)
+}
+.card.active {
+  display:block;
+  animation:pop .2s
+}
+@keyframes pop {
+  from {
+    opacity:0;
+    transform:translateY(8px)
+  }
+  to {
+    opacity:1;
+    transform:translateY(0)
+  }
+}
+h3 {
+  color:var(--gold);
+  margin:6px 0 10px
+}
+input,
+select,
+textarea {
+  width:100%;
+  padding:10px;
+  margin:4px 0;
+  border-radius:9px;
+  border:1px solid #2a2a2a;
+  background:#0f0f0f;
+  color:#fff;
+  font-size:14px
+}
+.btn {
+  width:100%;
+  padding:11px;
+  border-radius:10px;
+  border:none;
+  font-weight:800;
+  cursor:pointer;
+  margin:4px 0
+}
+.btn-gold {
+  background:var(--gold);
+  color:#111
+}
+.btn-blue {
+  background:var(--blue);
+  color:#fff
+}
+.btn-green {
+  background:var(--green);
+  color:#fff
+}
+.btn-red {
+  background:#b91c1c;
+  color:#fff
+}
+.tableBox {
+  overflow:auto;
+  border-radius:12px;
+  border:1px solid #222;
+  background:#fff;
+  margin-top:10px
+}
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:750px;
+  background:#fff;
+  color:#111
+}
+th,
+td {
+  padding:8px 6px;
+  font-size:12px;
+  border-bottom:1px solid #eee;
+  text-align:center
+}
+th {
+  background:#111;
+  color:var(--gold);
+  position:sticky;
+  top:0
+}
+.photo {
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid #ddd
+}
+.moreWrap {
+  position:relative;
+  display:inline-block
+}
+.moreBtn {
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:1px solid #ddd;
+  background:#fff;
+  color:#111;
+  cursor:pointer;
+  font-weight:900
+}
+.moreList {
+  position:absolute;
+  left:0;
+  top:34px;
+  background:#111;
+  border:1px solid #333;
+  border-radius:10px;
+  min-width:145px;
+  padding:5px;
+  display:none;
+  z-index:50;
+  box-shadow:0 12px 30px #000
+}
+.moreList.show {
+  display:block
+}
+.moreList button {
+  width:100%;
+  text-align:right;
+  background:none;
+  border:none;
+  color:#eee;
+  padding:8px 10px;
+  border-radius:6px;
+  font-size:13px;
+  cursor:pointer
+}
+.moreList button:hover {
+  background:#222;
+  color:var(--gold)
+}
+.modal {
+  position:fixed;
+  inset:0;
+  background:rgba(0,
+  0,
+  0,
+  .7);
+  backdrop-filter:blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+  padding:14px
+}
+.modal.open {
+  display:flex
+}
+.modalBox {
+  width:95%;
+  max-width:640px;
+  max-height:92vh;
+  overflow:auto;
+  background:#171717;
+  border:1px solid #2a2a2a;
+  border-radius:18px;
+  padding:18px;
+  position:relative;
+  box-shadow:0 30px 80px #000
+}
+.closeX {
+  position:absolute;
+  left:12px;
+  top:12px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#222;
+  border:1px solid #333;
+  color:#fff;
+  cursor:pointer;
+  font-size:16px
+}
+#bigMsg {
+  position:fixed;
+  inset:0;
+  background:rgba(0,
+  0,
+  0,
+  .9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  color:var(--gold);
+  font-size:28px;
+  font-weight:bold;
+  text-align:center
+}
+@media print {
+  .no-print {
+    display:none!important
+  }
+  body {
+    background:#fff
+  }
+}
+/* ===== تحسينات الواجهة وتجربة الاستخدام ===== */ :root  {
+  --gold:#c6a15b;
+  --card:#171c26;
+  --line:#2b3443;
+  --blue:#315b88;
+  --green:#287a62;
+}
+body  {
+  background:radial-gradient(ellipse at top,
+  #202b3b 0%,
+  #0b111b 62%,
+  #080d15 100%);
+  color:#edf2f7;
+}
+header  {
+  background:rgba(14,
+  21,
+  32,
+  .96);
+  border-bottom:1px solid #354255;
+  box-shadow:0 8px 30px rgba(0,
+  0,
+  0,
+  .28);
+}
+.wrap  {
+  max-width:1440px;
+  padding:14px 18px 30px
+}
+.topBar  {
+  display:grid;
+  grid-template-columns:repeat(6,
+  minmax(0,
+  1fr));
+  gap:7px;
+  overflow:visible;
+  padding:8px 0 12px;
+}
+.topBar button  {
+  min-width:0;
+  padding:9px 4px;
+  font-size:12px;
+  border-radius:9px;
+  background:linear-gradient(180deg,
+  #263449,
+  #1a2637);
+  border:1px solid #3b4b60;
+  color:#e7edf5;
+  box-shadow:0 4px 12px rgba(0,
+  0,
+  0,
+  .18);
+}
+.topBar button.activeGold  {
+  background:linear-gradient(180deg,
+  #d8bd83,
+  #b48a45);
+  color:#171717;
+  border-color:#d8bd83;
+}
+.card  {
+  background:linear-gradient(145deg,
+  #1b2431,
+  #151c27);
+  border:1px solid #344153;
+  box-shadow:0 16px 42px rgba(0,
+  0,
+  0,
+  .38),
+  0 2px 8px rgba(0,
+  0,
+  0,
+  .22);
+}
+.btn  {
+  box-shadow:0 4px 12px rgba(0,
+  0,
+  0,
+  .18)
+}
+.btn-gold  {
+  background:linear-gradient(135deg,
+  #d9bd82,
+  #b58a45)
+}
+.btn-blue  {
+  background:linear-gradient(135deg,
+  #416d9e,
+  #294c73)
+}
+.btn-green  {
+  background:linear-gradient(135deg,
+  #32866d,
+  #21634f)
+}
+.tableBox  {
+  box-shadow:0 10px 28px rgba(0,
+  0,
+  0,
+  .22)
+}
+.modal  {
+  background:rgba(3,
+  8,
+  15,
+  .82);
+  backdrop-filter:blur(13px);
+  padding:10px;
+}
+.modalBox  {
+  width:min(96vw,
+  760px);
+  max-width:760px;
+  max-height:94vh;
+  background:linear-gradient(145deg,
+  #202b3b,
+  #141c28);
+  border:1px solid #45546a;
+  box-shadow:0 28px 90px rgba(0,
+  0,
+  0,
+  .78),
+  0 0 0 1px rgba(255,
+  255,
+  255,
+  .025);
+}
+.closeX  {
+  position:sticky;
+  float:left;
+  top:0;
+  z-index:5;
+  display:grid;
+  place-items:center;
+  background:#303c4e;
+  border-color:#56657a;
+  font-size:19px;
+}
+.moreBtn  {
+  width:32px;
+  height:32px;
+  border-radius:9px;
+  border:1px solid #cbd5e1;
+  background:#f8fafc;
+  color:#182333;
+  font-size:20px;
+  line-height:1;
+}
+.moreList  {
+  min-width:155px;
+  border-color:#45546a;
+  background:#172131
+}
+.reportGrid  {
+  display:grid;
+  grid-template-columns:repeat(2,
+  minmax(0,
+  1fr));
+  gap:8px
+}
+.reportGrid>div  {
+  padding:9px;
+  border:1px solid #303e51;
+  border-radius:9px;
+  background:#172231
+}
+.reportGrid small,
+.reportGrid strong  {
+  display:block
+}
+.reportGrid small  {
+  color:#9eacbf;
+  margin-bottom:4px
+}
+.reportGrid strong  {
+  color:#f3f6fa
+}
+#loginScreen  {
+  background:rgba(2,
+  6,
+  12,
+  .94);
+  backdrop-filter:blur(16px)
+}
+.loginBox  {
+  background:#182231;
+  border-color:#34445a;
+  box-shadow:0 24px 80px rgba(0,
+  0,
+  0,
+  .75)
+}
+@media(max-width:650px)  {
+  .wrap  {
+    padding:10px
+  }
+  .topBar  {
+    grid-template-columns:repeat(3,
+    minmax(0,
+    1fr));
+    gap:6px
+  }
+  .topBar button  {
+    font-size:11px;
+    padding:9px 2px
+  }
+  .modalBox  {
+    width:100%;
+    padding:14px;
+    max-height:95vh
+  }
+}
+@media print  {
+  @page  {
+    size:A4;
+    margin:6mm
+  }
+  .no-print  {
+    display:none!important
+  }
+}
 </style>
 </head>
 <body>
-<div id="loginScreen">
-<div class="loginBox">
-<h1>تسجيل الدخول</h1>
-<input id="login_user" placeholder="اسم المستخدم (اليوزر)">
-<input id="login_pass" type="password" placeholder="كلمة المرور">
-<button class="green" onclick="doLogin()">دخول بيوزري</button>
-<button class="blue" onclick="createFromLogin()">إنشاء يوزر جديد (هيفتح فاضي من غير بيانات أي يوزر تاني)</button>
-<hr>
-<p style="color:#FFD700">يوزرك على جهاز تاني؟ افتحه من ملفه</p>
-<input type="file" id="importLogin" accept=".json">
-</div>
-</div>
+<div id="loginScreen"><div class="loginBox"><h2>الأمل للتدريب</h2><input id="uName" placeholder="اليوزر"><input id="uPass" type="password" placeholder="الباسورد"><button class="btn btn-gold" onclick="authLogin()">دخول</button><button class="btn btn-blue" onclick="authCreate()" style="margin-top:6px">إنشاء حساب جديد</button><div style="margin-top:10px"><input type="file" id="importAcc" accept=".json"></div></div></div>
 <div id="bigMsg"></div>
-<header id="academyTitle">الأمل للتدريب</header>
-<div id="userBar" style="text-align:center;background:#111;padding:8px;border-bottom:1px solid #FFD700">غير مسجل دخول</div>
+<header id="mainTitle">الأمل للتدريب</header>
+<div id="userBar">غير مسجل</div>
 <div class="wrap">
-<div class="menu">
-<button onclick="showSec('general')">شعبة عامة</button>
-<button onclick="showSec('labs')">تحاليل طبية</button>
-<button onclick="showSec('nursing')">تمريض</button>
-<button onclick="showSec('affairs')">شئون طلاب</button>
-<button onclick="showSec('fees')">قسم الأقساط</button>
-<button onclick="openSettings()">الاعدادات</button>
+<div class="topBar no-print">
+<button class="activeGold" onclick="app.go('general')">شعبة عامة</button>
+<button class="activeGold" onclick="app.go('labs')">تحاليل</button>
+<button class="activeGold" onclick="app.go('nursing')">تمريض</button>
+<button onclick="app.go('affairs')">شئون الطلاب</button>
+<button onclick="app.go('fees')">الأقساط</button>
+<button onclick="app.settings()">الاعدادات</button>
 </div>
-<div id="general" class="card">
-<h3>طلاب شعبة عامة</h3>
-<button class="blue no-print" onclick="window.print()">طباعة</button>
-<button class="green no-print" onclick="exportTable('tbl_general')">اكسل</button>
-<div style="overflow:auto"><table id="tbl_general"><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>القومي</th><th>الجنس</th><th>الميلاد</th><th>العنوان</th><th>الرمز</th><th class="no-print">تعديل</th></tr></thead><tbody id="tb_general"></tbody></table></div>
-<h3>جدول المحاضرات</h3>
-<input id="lt_general" placeholder="اسم المحاضرة"><input id="ld_general" type="date"><button onclick="addLecture('general')">إضافة محاضرة</button>
-<table><thead><tr><th>التاريخ</th><th>المحاضرة</th><th class="no-print">حذف</th></tr></thead><tbody id="lec_general"></tbody></table>
-</div>
-<div id="labs" class="card">
-<h3>طلاب تحاليل طبية</h3>
-<button class="blue no-print" onclick="window.print()">طباعة</button>
-<button class="green no-print" onclick="exportTable('tbl_labs')">اكسل</button>
-<div style="overflow:auto"><table id="tbl_labs"><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>القومي</th><th>الجنس</th><th>الميلاد</th><th>العنوان</th><th>الرمز</th><th class="no-print">تعديل</th></tr></thead><tbody id="tb_labs"></tbody></table></div>
-<h3>جدول المحاضرات</h3>
-<input id="lt_labs" placeholder="اسم المحاضرة"><input id="ld_labs" type="date"><button onclick="addLecture('labs')">إضافة محاضرة</button>
-<table><thead><tr><th>التاريخ</th><th>المحاضرة</th><th class="no-print">حذف</th></tr></thead><tbody id="lec_labs"></tbody></table>
-</div>
-<div id="nursing" class="card">
-<h3>طلاب تمريض</h3>
-<button class="blue no-print" onclick="window.print()">طباعة</button>
-<button class="green no-print" onclick="exportTable('tbl_nursing')">اكسل</button>
-<div style="overflow:auto"><table id="tbl_nursing"><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>القومي</th><th>الجنس</th><th>الميلاد</th><th>العنوان</th><th>الرمز</th><th class="no-print">تعديل</th></tr></thead><tbody id="tb_nursing"></tbody></table></div>
-<h3>جدول المحاضرات</h3>
-<input id="lt_nursing" placeholder="اسم المحاضرة"><input id="ld_nursing" type="date"><button onclick="addLecture('nursing')">إضافة محاضرة</button>
-<table><thead><tr><th>التاريخ</th><th>المحاضرة</th><th class="no-print">حذف</th></tr></thead><tbody id="lec_nursing"></tbody></table>
-</div>
+<div id="general" class="card"><h3>شعبة عامة <span id="c_general"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_general"></tbody></table></div></div>
+<div id="labs" class="card"><h3>تحاليل طبية <span id="c_labs"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_labs"></tbody></table></div></div>
+<div id="nursing" class="card"><h3>تمريض <span id="c_nursing"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_nursing"></tbody></table></div></div>
 <div id="affairs" class="card active">
-<h3>شئون طلاب</h3>
-<button class="green" onclick="openModal()">إضافة طالب جديد</button>
-<button class="blue" onclick="startCamera()">فتح كاميرا الموبايل لمسح الرمز</button>
-<video id="cam" playsinline style="display:none"></video>
-<canvas id="camCanvas" style="display:none"></canvas>
-<label class="no-print">مسح الرمز من صورة</label>
-<input type="file" id="qrFile" accept="image/*">
-<button class="red" onclick="resetToday()">تصفير حضور وغياب اليوم</button>
-<button class="green" onclick="exportUSB()">تصدير حسابي للنقل بالـ USB</button>
-<label>استيراد حساب من ملف USB</label>
-<input type="file" id="importUSB" accept=".json">
-<input id="searchBox" placeholder="ابحث بالاسم أو الفون أو الكود أو القومي أو العنوان" oninput="render()">
-<div style="overflow:auto"><table><thead><tr><th>الصورة</th><th>الكود</th><th>الاسم</th><th>الشعبة</th><th>الفرقة</th><th>فون الطالب</th><th>اسم ولي الأمر</th><th>فون ولي الأمر</th><th>العنوان</th><th>الرمز</th><th class="no-print">إجراء</th></tr></thead><tbody id="tb_affairs"></tbody></table></div>
-<h3>تقرير طالب</h3>
-<select id="reportSel" onchange="report()"></select>
-<div id="reportBox" style="background:#000;border:1px solid #FFD700;padding:10px;border-radius:8px">اختر طالب</div>
-<button class="blue" onclick="window.print()">طباعة التقرير</button>
-<button class="green" onclick="sendParentWhatsApp()">إرسال تقرير ولي الأمر واتساب</button>
+<div style="display:flex;gap:6px"><button class="btn btn-green" style="flex:1" onclick="student.open()">+ طالب جديد</button><button class="btn btn-blue" style="flex:1" onclick="scanner.openCam()">📷 مسح كاميرا</button><button class="btn btn-gold" style="flex:1" onclick="printer.print24()">🖨️ طباعة 24 محدد</button></div>
+<video id="cam" playsinline style="display:none;width:100%;border-radius:12px;margin-top:8px;border:1px solid #333"></video><canvas id="can" style="display:none"></canvas>
+<div style="display:flex;gap:6px;margin-top:8px"><input id="search" placeholder="ابحث بالاسم او الكود او الفون" oninput="app.render()"><label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" id="checkAll" onchange="selector.all(this.checked)"> اختيار الكل</label></div>
+<input type="file" id="qrFile" accept="image/*" style="margin-top:6px">
+<div class="tableBox"><table><thead><tr><th>✔</th><th>صورة</th><th>كود</th><th>اسم</th><th>شعبة</th><th>فون</th><th>رمز</th><th>اجراء</th></tr></thead><tbody id="tb_affairs"></tbody></table></div>
+<h3>تقرير طالب</h3><select id="repSel" onchange="report.show()"></select><button class="btn btn-blue no-print" style="margin:8px 0" onclick="report.print()">🖨️ طباعة تقرير الطالب</button><div id="repBox" style="background:#0f0f0f;border:1px solid #222;padding:10px;border-radius:10px">اختار طالب</div>
 </div>
-<div id="fees" class="card">
-<h3>قسم الأقساط</h3>
-<div id="fee_alert"></div>
-<input type="hidden" id="editFeeId">
-<select id="fee_student"></select>
-<input id="fee_total" type="number" placeholder="القسط كامل">
-<input id="fee_paid" type="number" placeholder="دفع كام">
-<label>تاريخ القسط القادم</label>
-<input id="fee_next" type="date">
-<button class="green" onclick="addFee()">حفظ / تعديل القسط</button>
-<input id="fee_search" placeholder="ابحث في الأقساط باسم الطالب أو فونه" oninput="renderFees()">
-<button class="blue no-print" onclick="window.print()">طباعة جدول الأقساط</button>
-<div style="overflow:auto"><table id="tbl_fees"><thead><tr><th>مسلسل</th><th>اسم الطالب</th><th>رقم الفون</th><th>القسط كامل</th><th>دفع كام</th><th>باقي كام</th><th>موعد القسط القادم</th><th class="no-print">إجراء</th></tr></thead><tbody id="tb_fees"></tbody></table></div>
+<div id="fees" class="card"><h3>الأقساط</h3><div id="feeAlert" style="display:none;background:#2a0a0a;border:1px solid #5a1a1a;padding:10px;border-radius:10px;margin-bottom:8px"></div><select id="feeStu"></select><input id="feeTotal" type="number" placeholder="الاجمالي"><input id="feePaid" type="number" placeholder="المدفوع"><input id="feeDate" type="date"><button class="btn btn-green" onclick="fees.save()">حفظ القسط</button><input id="feeSearch" placeholder="ابحث في الاقساط" oninput="app.render()"><div class="tableBox"><table><thead><tr><th>#</th><th>الاسم</th><th>فون</th><th>كامل</th><th>دفع</th><th>باقي</th><th>معاد</th><th>⋮</th></tr></thead><tbody id="tb_fees"></tbody></table></div></div>
+<div id="settings" class="card"><h3>الاعدادات</h3><label>اسم الاكاديمية</label><input id="setName"><label>لون الخلفية</label><input type="color" id="setBg"><button class="btn btn-blue" onclick="app.saveSet()">حفظ</button><button class="btn btn-red" style="margin-top:8px" onclick="authLogout()">تسجيل خروج</button></div>
 </div>
-<div id="settings" class="card">
-<h3>الاعدادات والحساب</h3>
-<label>اسم الأكاديمية</label><input id="set_name">
-<label>لون الخلفية</label><input type="color" id="set_bg">
-<button class="blue" onclick="exportUSB()">تصدير حسابي (ملف حسابي) للنقل بالـ USB لأي جهاز</button>
-<button onclick="logout()">تسجيل خروج - هيرجع لشاشة اليوزر</button>
-<hr>
-<h3>قاعدة البيانات</h3>
-<pre id="dbView">اضغط عرض</pre>
-<button class="blue" onclick="showDB()">عرض قاعدة بيانات يوزري</button>
-<hr>
-<label>كلمة مرور الاعدادات جديدة</label><input id="set_pass" placeholder="اتركها فارغة">
-<button class="green" onclick="saveSettings()">حفظ الاعدادات</button>
-<button class="red" onclick="clearMyData()">مسح بيانات يوزري بس</button>
-</div>
-</div>
-<div id="modal" class="modal">
-<div class="modalBox">
-<h3>بيانات الطالب</h3>
-<input type="hidden" id="editId">
-<input id="f_name" placeholder="الاسم بالكامل">
-<select id="f_div"><option value="">اختر الشعبة</option><option value="general">شعبة عامة</option><option value="labs">تحاليل طبية</option><option value="nursing">تمريض</option></select>
-<input id="f_band" placeholder="الفرقة">
-<input id="f_phone" placeholder="فون الطالب">
-<input id="f_guardian" placeholder="اسم ولي الأمر">
-<input id="f_parent" placeholder="فون ولي الأمر">
-<input id="f_nid" placeholder="الرقم القومي">
-<select id="f_gender"><option value="">الجنس</option><option>ذكر</option><option>أنثى</option></select>
-<label>تاريخ الميلاد</label><input id="f_dob" type="date">
-<textarea id="f_address" placeholder="العنوان بالتفصيل"></textarea>
-<label>الصورة</label><input id="f_photo" type="file" accept="image/*">
-<img id="prev" style="width:80px;height:80px;border-radius:50%;display:none;margin:auto;object-fit:cover">
-<button class="green" onclick="saveStudent()">حفظ وتوليد الرمز</button>
-<button onclick="closeModal()">إغلاق</button>
-</div>
-</div><script>
-function emptyData(){return {students:[],lectures:{general:[],labs:[],nursing:[]},fees:[],attendance:[],settings:{name:"الأمل للتدريب",bg:"#0d0d0d",pass:"1234"}};}
-var USERS={}; try{var s=localStorage.getItem('alamal_users_v4');if(s)USERS=JSON.parse(s);}catch(e){}
-var CUR=""; var DB=emptyData(); var photoData="", scanning=false;
-function saveUsers(){localStorage.setItem('alamal_users_v4',JSON.stringify(USERS));}
-function saveDB(){ if(!CUR)return; USERS[CUR].data=DB; saveUsers(); updateUserBar(); }
-function updateUserBar(){document.getElementById('userBar').textContent=CUR?("مسجل دخول: "+CUR+" - بياناتك لوحدك"):"غير مسجل دخول";}
-function checkLogin(){ document.getElementById('loginScreen').style.display=(sessionStorage.getItem('alamal_logged')&&CUR)?'none':'flex'; if(sessionStorage.getItem('alamal_logged')){var u=sessionStorage.getItem('alamal_logged'); if(USERS[u]){CUR=u; DB=USERS[u].data; document.getElementById('loginScreen').style.display='none'; applySettings(); render(); updateUserBar(); return;}} document.getElementById('loginScreen').style.display='flex'; }
-function doLogin(){var u=document.getElementById('login_user').value.trim();var p=document.getElementById('login_pass').value.trim(); if(!USERS[u]){alert("اليوزر ده مش موجود. لو أول مرة دوس إنشاء يوزر جديد");return;} if(USERS[u].pass!==p){alert("الباسورد غلط");return;} CUR=u; DB=USERS[u].data; sessionStorage.setItem('alamal_logged',u); document.getElementById('loginScreen').style.display='none'; applySettings(); render(); updateUserBar(); alert("أهلاً "+u+" - دي بياناتك انت بس"); }
-function createFromLogin(){var u=document.getElementById('login_user').value.trim();var p=document.getElementById('login_pass').value.trim(); if(!u||!p){alert("اكتب يوزر وباسورد");return;} if(USERS[u]){alert("اليوزر ده موجود، دوس دخول بيوزري");return;} USERS[u]={pass:p,data:emptyData()}; CUR=u; DB=USERS[u].data; saveUsers(); sessionStorage.setItem('alamal_logged',u); document.getElementById('loginScreen').style.display='none'; applySettings(); render(); updateUserBar(); alert("تم إنشاء يوزر جديد: "+u+"\nالبرنامج فاضي ليك، مفيش أي بيانات من أي يوزر تاني"); }
-document.getElementById('importLogin').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var pkg=JSON.parse(ev.target.result); var u=prompt("اليوزر بتاع الملف ده"); var p=prompt("الباسورد"); if(pkg.user===u&&pkg.pass===p){ USERS[u]={pass:p,data:pkg.data}; CUR=u; DB=pkg.data; saveUsers(); sessionStorage.setItem('alamal_logged',u); document.getElementById('loginScreen').style.display='none'; applySettings(); render(); alert("تم فتح حساب "+u+" على الجهاز ده بكل بياناته"); }else alert("اليوزر أو الباسورد غلط");}catch(err){alert("ملف غير صالح");}};r.readAsText(f);});
-function showSec(id){document.querySelectorAll('.card').forEach(function(c){c.classList.remove('active')});document.getElementById(id).classList.add('active');render();}
-function openSettings(){var p=prompt("كلمة مرور الاعدادات");if(p===DB.settings.pass)showSec('settings');else if(p!==null)alert("خاطئة");}
-function divName(v){return v==='general'?'شعبة عامة':v==='labs'?'تحاليل طبية':'تمريض';}
-function makeQR(el,code){el.innerHTML="";try{var qr=qrcode(0,'M');qr.addData(code);qr.make();el.innerHTML=qr.createSvgTag(3,6);var svg=el.querySelector('svg');if(svg){svg.style.width='90px';svg.style.height='90px';svg.style.background='#fff';}}catch(e){el.textContent=code;}}
-function printQR(code,name){var w=window.open("","_blank");w.document.write('<html lang="ar" dir="rtl"><body style="text-align:center"><h3>'+DB.settings.name+'</h3><p>'+name+'</p><div id="q"></div><p>'+code+'</p><script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"><\/script><script>var qr=qrcode(0,"M");qr.addData("'+code+'");qr.make();document.getElementById("q").innerHTML=qr.createSvgTag(6,10);setTimeout(function(){window.print()},600)<\/script></body></html>');w.document.close();}
-function openModal(){document.getElementById('editId').value="";document.getElementById('modal').classList.add('open');}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-document.getElementById('f_photo').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){photoData=ev.target.result;var im=document.getElementById('prev');im.src=photoData;im.style.display='block';};r.readAsDataURL(f);});
-function editStudent(id){var s=DB.students.find(function(x){return x.id===id});if(!s)return;document.getElementById('editId').value=id;document.getElementById('f_name').value=s.name||"";document.getElementById('f_div').value=s.division||"";document.getElementById('f_band').value=s.band||"";document.getElementById('f_phone').value=s.phone||"";document.getElementById('f_guardian').value=s.guardian||"";document.getElementById('f_parent').value=s.parent||"";document.getElementById('f_nid').value=s.nid||"";document.getElementById('f_gender').value=s.gender||"";document.getElementById('f_dob').value=s.dob||"";document.getElementById('f_address').value=s.address||"";photoData=s.photo||"";var im=document.getElementById('prev');if(photoData){im.src=photoData;im.style.display='block';}else im.style.display='none';document.getElementById('modal').classList.add('open');}
-function saveStudent(){var name=document.getElementById('f_name').value.trim();var div=document.getElementById('f_div').value;if(!name||!div){alert("اكتب الاسم والشعبة");return;}var eid=document.getElementById('editId').value;var data={name:name,division:div,band:document.getElementById('f_band').value,phone:document.getElementById('f_phone').value,guardian:document.getElementById('f_guardian').value,parent:document.getElementById('f_parent').value,nid:document.getElementById('f_nid').value,gender:document.getElementById('f_gender').value,dob:document.getElementById('f_dob').value,address:document.getElementById('f_address').value,photo:photoData};if(eid){var old=DB.students.find(function(x){return x.id==eid});if(old)Object.assign(old,data);alert("تم التعديل");}else{data.id=Date.now();data.code="AM"+Date.now().toString().slice(-6);DB.students.push(data);alert("تم الحفظ");}saveDB();closeModal();render();}
-function delStudent(id){if(confirm("حذف؟")){DB.students=DB.students.filter(function(s){return s.id!==id});saveDB();render();}}
-function fillDiv(div){var tb=document.getElementById('tb_'+div);tb.innerHTML="";DB.students.filter(function(s){return s.division===div}).forEach(function(s){var tr=document.createElement('tr');tr.innerHTML='<td>'+(s.photo?'<img class="photo" src="'+s.photo+'">':'-')+'</td><td>'+s.code+'</td><td>'+s.name+'</td><td>'+(s.band||'-')+'</td><td>'+(s.phone||'-')+'</td><td>'+(s.guardian||'-')+'</td><td>'+(s.parent||'-')+'</td><td>'+(s.nid||'-')+'</td><td>'+(s.gender||'-')+'</td><td>'+(s.dob||'-')+'</td><td>'+(s.address||'-')+'</td>';var qrtd=document.createElement('td');makeQR(qrtd,s.code);var b=document.createElement('button');b.className='blue no-print';b.textContent='طباعة الرمز';b.onclick=function(){printQR(s.code,s.name)};qrtd.appendChild(document.createElement('br'));qrtd.appendChild(b);tr.appendChild(qrtd);var etd=document.createElement('td');etd.className='no-print';etd.innerHTML='<button class="green" onclick="editStudent('+s.id+')">تعديل</button>';tr.appendChild(etd);tb.appendChild(tr);});var lt=document.getElementById('lec_'+div);lt.innerHTML="";DB.lectures[div].forEach(function(l){var tr=document.createElement('tr');tr.innerHTML='<td>'+l.date+'</td><td>'+l.title+'</td><td class="no-print"><button class="red" onclick="delLecture(\''+div+'\','+l.id+')">حذف</button></td>';lt.appendChild(tr);});}
-function render(){
- ['general','labs','nursing'].forEach(fillDiv);
- var q=(document.getElementById('searchBox').value||"").toLowerCase().trim();
- var tb=document.getElementById('tb_affairs');tb.innerHTML="";
- DB.students.forEach(function(s){
-  var all=(s.name+" "+s.phone+" "+s.parent+" "+(s.guardian||"")+" "+s.code+" "+s.nid+" "+s.address+" "+s.band).toLowerCase();
-  if(q&&all.indexOf(q)===-1)return;
-  var tr=document.createElement('tr');
-  tr.innerHTML='<td>'+(s.photo?'<img class="photo" src="'+s.photo+'">':'-')+'</td><td>'+s.code+'</td><td>'+s.name+'</td><td>'+divName(s.division)+'</td><td>'+(s.band||'-')+'</td><td>'+(s.phone||'-')+'</td><td>'+(s.guardian||'-')+'</td><td>'+(s.parent||'-')+'</td><td>'+(s.address||'-')+'</td>';
-  var qrtd=document.createElement('td');makeQR(qrtd,s.code);tr.appendChild(qrtd);
-  var atd=document.createElement('td');atd.className='no-print';
-  atd.innerHTML='<button class="green" onclick="attend('+s.id+',\'present\')">حضور</button><button class="orange" onclick="attend('+s.id+',\'absent\')">غياب</button><button onclick="editStudent('+s.id+')">تعديل</button><button class="red" onclick="delStudent('+s.id+')">حذف</button>';
-  var pb=document.createElement('button');pb.className='blue';pb.textContent='طباعة الرمز';pb.onclick=function(){printQR(s.code,s.name)};atd.appendChild(pb);
-  tr.appendChild(atd);tb.appendChild(tr);
- });
- var sel=document.getElementById('reportSel');var old=sel.value;sel.innerHTML='<option value="">اختر طالب</option>';
- var fsel=document.getElementById('fee_student');var oldf=fsel.value;fsel.innerHTML='<option value="">اختر طالب للأقساط</option>';
- DB.students.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.code+" - "+s.name;sel.appendChild(o);var o2=document.createElement('option');o2.value=s.id;o2.textContent=s.name+" - "+(s.phone||"");fsel.appendChild(o2);});
- if(old)sel.value=old; if(oldf)fsel.value=oldf;
- renderFees();
-}
-function addLecture(div){var t=document.getElementById('lt_'+div).value;var d=document.getElementById('ld_'+div).value;if(!t||!d){alert("اكتب المحاضرة والتاريخ");return;}DB.lectures[div].push({id:Date.now(),title:t,date:d});saveDB();render();}
-function delLecture(div,id){DB.lectures[div]=DB.lectures[div].filter(function(x){return x.id!==id});saveDB();render();}
-function attend(id,status){var s=DB.students.find(function(x){return x.id===id});if(!s)return;var today=new Date().toISOString().slice(0,10);DB.attendance=DB.attendance.filter(function(a){return !(a.studentId===id&&a.date===today)});var time=new Date().toLocaleTimeString('ar-EG');DB.attendance.push({studentId:id,date:today,time:time,status:status});saveDB();var label=status==='present'?'حضر اليوم':'غائب اليوم';var bm=document.getElementById('bigMsg');bm.innerHTML=label+"<br>"+s.name+"<br>"+time;bm.style.display='flex';try{var u=new SpeechSynthesisUtterance(label+" الطالب "+s.name);u.lang='ar-EG';if(status==='present')speechSynthesis.speak(u);}catch(e){}setTimeout(function(){bm.style.display='none';},3500);report();}
-function startCamera(){var video=document.getElementById('cam');video.style.display='block';if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert("الكاميرا مش هتشتغل من مدير الملفات، استخدم مسح الرمز من صورة");return;}navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(stream){video.srcObject=stream;video.play();scanning=true;var canvas=document.getElementById('camCanvas');var ctx=canvas.getContext('2d');function tick(){if(!scanning)return;if(video.readyState===video.HAVE_ENOUGH_DATA){canvas.width=video.videoWidth;canvas.height=video.videoHeight;ctx.drawImage(video,0,0,canvas.width,canvas.height);var img=ctx.getImageData(0,0,canvas.width,canvas.height);var qr=jsQR(img.data,img.width,img.height);if(qr){var s=DB.students.find(function(x){return x.code===qr.data.trim()});if(s){attend(s.id,'present');stream.getTracks().forEach(function(t){t.stop()});video.style.display='none';scanning=false;return;}}}requestAnimationFrame(tick);}tick();}).catch(function(){alert("اسمح بالكاميرا أو استخدم مسح من صورة")});}
-document.getElementById('qrFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;var img=new Image();img.onload=function(){var c=document.getElementById('camCanvas');c.width=img.width;c.height=img.height;var ctx=c.getContext('2d');ctx.drawImage(img,0,0);var data=ctx.getImageData(0,0,c.width,c.height);var qr=jsQR(data.data,data.width,data.height);if(qr){var s=DB.students.find(function(x){return x.code===qr.data.trim()});if(s)attend(s.id,'present');else alert("الكود غير مسجل");}else alert("لا يوجد رمز واضح");};img.src=URL.createObjectURL(f);});
-function resetToday(){var t=new Date().toISOString().slice(0,10);DB.attendance=DB.attendance.filter(function(a){return a.date!==t});saveDB();alert("تم التصفير");}
-function counts(id){var list=DB.attendance.filter(function(a){return a.studentId==id});return {present:list.filter(function(a){return a.status!=='absent'}).length,absent:list.filter(function(a){return a.status==='absent'}).length,list:list};}
-function report(){var id=document.getElementById('reportSel').value;var box=document.getElementById('reportBox');if(!id){box.innerHTML="اختر طالب";return;}var c=counts(id);box.innerHTML="حضر: "+c.present+" مرة<br>غاب: "+c.absent+" مرة<br><hr>"+c.list.map(function(a){return a.date+" "+a.time+" - "+(a.status==='absent'?'غياب':'حضور')}).join("<br>");}
-function sendParentWhatsApp(){var id=document.getElementById('reportSel').value;if(!id){alert("اختر طالب الأول من التقرير");return;}var s=DB.students.find(function(x){return x.id==id});var c=counts(id);var myFees=DB.fees.filter(function(f){return f.studentId==id});var remain=myFees.reduce(function(sum,f){return sum+(f.total-f.paid)},0);var next=myFees.length?myFees[myFees.length-1].nextDate||"-":"-";var phone=(s.parent||"").replace(/[^0-9]/g,"");if(phone.startsWith("0"))phone="2"+phone;var msg="تقرير مركز الأمل للتدريب\nالطالب: "+s.name+"\nحضر: "+c.present+" مرة\nغاب: "+c.absent+" مرة\nالباقي عليه: "+remain+" جنيه\nموعد القسط القادم: "+next;window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg),"_blank");}
-function addFee(){var sid=document.getElementById('fee_student').value;var total=parseFloat(document.getElementById('fee_total').value||0);var paid=parseFloat(document.getElementById('fee_paid').value||0);var next=document.getElementById('fee_next').value;if(!sid){alert("اختر الطالب");return;}var eid=document.getElementById('editFeeId').value;if(eid){var old=DB.fees.find(function(x){return x.id==eid});if(old){old.studentId=parseInt(sid);old.total=total;old.paid=paid;old.nextDate=next;}document.getElementById('editFeeId').value="";alert("تم تعديل القسط");}else{DB.fees.push({id:Date.now(),studentId:parseInt(sid),total:total,paid:paid,nextDate:next});alert("تم حفظ القسط");}saveDB();renderFees();}
-function editFee(id){var f=DB.fees.find(function(x){return x.id===id});if(!f)return;document.getElementById('editFeeId').value=id;document.getElementById('fee_student').value=f.studentId;document.getElementById('fee_total').value=f.total;document.getElementById('fee_paid').value=f.paid;document.getElementById('fee_next').value=f.nextDate||"";window.scrollTo(0,0);alert("عدّل القسط فوق ودوس حفظ / تعديل القسط");}
-function renderFees(){var tb=document.getElementById('tb_fees');if(!tb)return;var q=(document.getElementById('fee_search')?document.getElementById('fee_search').value:"").toLowerCase().trim();tb.innerHTML="";var today=new Date();today.setHours(0,0,0,0);var alerts=[];DB.fees.forEach(function(f){if(!f.nextDate)return;var s=DB.students.find(function(x){return x.id===f.studentId});if(!s)return;var d=new Date(f.nextDate);var diff=Math.ceil((d-today)/86400000);if(diff<0)alerts.push("متأخر: "+s.name+" - كان معاده "+f.nextDate+" - باقي "+(f.total-f.paid));else if(diff<=7)alerts.push("قرب: "+s.name+" - معاده "+f.nextDate+" - باقي "+(f.total-f.paid));});var ab=document.getElementById('fee_alert');if(alerts.length){ab.style.display='block';ab.innerHTML="<b>تنبيه الأقساط القادمة والمتأخرة:</b><br>"+alerts.join("<br>");}else{ab.style.display='none';ab.innerHTML="";}var i=0;DB.fees.forEach(function(f){var s=DB.students.find(function(x){return x.id===f.studentId});if(!s)return;var all=(s.name+" "+(s.phone||"")).toLowerCase();if(q&&all.indexOf(q)===-1)return;i++;var remain=f.total-f.paid;var tr=document.createElement('tr');tr.innerHTML='<td>'+i+'</td><td>'+s.name+'</td><td>'+(s.phone||'-')+'</td><td>'+f.total+'</td><td>'+f.paid+'</td><td>'+remain+'</td><td>'+(f.nextDate||'-')+'</td><td class="no-print"><button class="green" onclick="editFee('+f.id+')">تعديل</button><button class="red" onclick="delFee('+f.id+')">حذف</button></td>';tb.appendChild(tr);});}
-function delFee(id){if(confirm("حذف القسط؟")){DB.fees=DB.fees.filter(function(x){return x.id!==id});saveDB();renderFees();}}
-function exportTable(id){var tbl=document.getElementById(id);var blob=new Blob(['\ufeff<html><meta charset="UTF-8"><body>'+tbl.outerHTML+'</body></html>'],{type:'application/vnd.ms-excel'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='جدول.xls';a.click();}
-function exportUSB(){if(!CUR){alert("ادخل بيوزرك الأول");return;}var pkg={user:CUR,pass:USERS[CUR].pass,data:DB};var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(pkg)],{type:'application/json'}));a.download='حسابي_'+CUR+'.json';a.click();alert("نزل ملف حسابي_"+CUR+".json - انقله بالـ USB، وعلى أي جهاز افتحه من شاشة الدخول بنفس اليوزر والباسورد");}
-function handleImportUSB(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var pkg=JSON.parse(ev.target.result);USERS[pkg.user]={pass:pkg.pass,data:pkg.data};CUR=pkg.user;DB=pkg.data;saveUsers();sessionStorage.setItem('alamal_logged',CUR);applySettings();render();alert("تم استيراد حساب "+CUR);}catch(err){alert("ملف غير صالح")}};r.readAsText(f);}
-document.getElementById('importUSB').addEventListener('change',handleImportUSB);
-function showDB(){document.getElementById('dbView').textContent=JSON.stringify({user:CUR,students:DB.students.length,fees:DB.fees.length,attendance:DB.attendance.length,tables:["students","fees","attendance","lectures","settings"]},null,2);}
-function logout(){sessionStorage.removeItem('alamal_logged');CUR="";DB=emptyData();updateUserBar();document.getElementById('loginScreen').style.display='flex';}
-function saveSettings(){DB.settings.name=document.getElementById('set_name').value||DB.settings.name;DB.settings.bg=document.getElementById('set_bg').value;var np=document.getElementById('set_pass').value.trim();if(np)DB.settings.pass=np;saveDB();applySettings();alert("تم الحفظ");}
-function applySettings(){document.body.style.background=DB.settings.bg;document.getElementById('academyTitle').textContent=DB.settings.name;document.getElementById('set_name').value=DB.settings.name;document.getElementById('set_bg').value=DB.settings.bg;}
-function clearMyData(){if(confirm("مسح بيانات يوزرك بس؟")){DB=emptyData();saveDB();render();alert("تم مسح بياناتك لوحدك");}}
-applySettings();updateUserBar();checkLogin();if(CUR)render();
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<div id="stuModal" class="modal" onclick="if(event.target===this) student.close()"><div class="modalBox"><button class="closeX" onclick="student.close()">✕</button><h3 style="margin-top:2px">بيانات الطالب</h3><input type="hidden" id="editId"><input id="s_name" placeholder="الاسم كامل"><select id="s_div"><option value="">اختر الشعبة</option><option value="general">شعبة عامة</option><option value="labs">تحاليل طبية</option><option value="nursing">تمريض</option></select><input id="s_band" placeholder="الفرقة"><input id="s_phone" placeholder="فون الطالب"><input id="s_guard" placeholder="اسم ولي الامر"><input id="s_parent" placeholder="فون ولي الامر"><input id="s_nid" placeholder="الرقم القومي"><select id="s_gender"><option value="">الجنس</option><option>ذكر</option><option>أنثى</option></select><input id="s_dob" type="date"><textarea id="s_addr" placeholder="العنوان"></textarea><input id="s_photo" type="file" accept="image/*"><img id="s_prev" style="width:80px;height:80px;border-radius:50%;display:none;margin:8px auto;object-fit:cover;border:2px solid var(--gold)"><button class="btn btn-gold" onclick="student.save()">حفظ وتوليد الرمز</button></div></div>
 <script>
-firebase.initializeApp({
-  apiKey: "AIzaSyBSXqnQLZRZgwa4K5as1Nj_GXjgs8h1z1k",
-  authDomain: "academy-attendance-d5a88.firebaseapp.com",
-  projectId: "academy-attendance-d5a88",
-  storageBucket: "academy-attendance-d5a88.firebasestorage.app",
-  messagingSenderId: "1049112680070",
-  appId: "1:1049112680070:web:c88a336a62886b4fae2307"
-});
-var cloudDb = firebase.firestore();
-var oldSaveUsers2 = saveUsers;
-saveUsers = function(){
-  oldSaveUsers2();
-  if(CUR && USERS[CUR]){
-    cloudDb.collection("alamal_users").doc(CUR).set(USERS[CUR]).catch(function(e){console.log(e)});
-  }
-};
-function pullFromCloud(){
-  if(!CUR) return;
-  cloudDb.collection("alamal_users").doc(CUR).get().then(function(doc){
-    if(doc.exists){
-      USERS[CUR] = doc.data();
-      DB = USERS[CUR].data;
-      oldSaveUsers2();
-      applySettings(); render(); updateUserBar();
-    } else { saveUsers(); }
-  }).catch(function(e){console.log(e)});
+// 1- التخزين
+let USERS= {
 }
-var oldDoLogin2 = doLogin;
-doLogin = function(){
-  var inputs = document.querySelectorAll('#loginScreen input');
-  var u = inputs[0] ? inputs[0].value.trim() : "";
-  if(u && !USERS[u]){
-    cloudDb.collection("alamal_users").doc(u).get().then(function(doc){
-      if(doc.exists){
-        USERS[u] = doc.data();
-        oldSaveUsers2();
-        oldDoLogin2();
-        setTimeout(pullFromCloud, 600);
-      } else {
-        oldDoLogin2();
-      }
-    }).catch(function(e){ console.log(e); oldDoLogin2(); });
-  } else {
-    oldDoLogin2();
-    setTimeout(pullFromCloud, 600);
+;
+try {
+  USERS=JSON.parse(localStorage.getItem('amal_users')||'{}')
+} catch {
+}
+let CUR=sessionStorage.getItem('amal_cur')||"";
+let DB= {
+  students:[],
+  fees:[],
+  attendance:[],
+  lectures: {
+    general:[],
+    labs:[],
+    nursing:[]
   }
-};
-var oldCreate2 = createFromLogin;
-createFromLogin = function(){ oldCreate2(); setTimeout(saveUsers, 600); };
-setInterval(function(){ if(CUR) pullFromCloud(); }, 10000);
-setTimeout(pullFromCloud, 1500);
-console.log("Firebase academy-attendance-d5a88 Connected");
+  ,
+  settings: {
+    name:"الأمل للتدريب",
+    bg:"#0a0a0a",
+    pass:"1234"
+  }
+}
+;
+let tmpPhoto="",
+isScanning=false,
+picked=new Set();
+function fresh() {
+  return  {
+    students:[],
+    fees:[],
+    attendance:[],
+    lectures: {
+      general:[],
+      labs:[],
+      nursing:[]
+    }
+    ,
+    settings: {
+      name:"الأمل للتدريب",
+      bg:"#0a0a0a",
+      pass:"1234"
+    }
+  }
+}
+function saveAll() {
+  if(!CUR)return;
+  USERS[CUR].data=DB;
+  localStorage.setItem('amal_users',JSON.stringify(USERS));
+  document.getElementById('userBar').textContent="داخل: "+CUR
+}
+// 2- الدخول
+function authLogin() {
+  let u=document.getElementById('uName').value.trim(),
+  p=document.getElementById('uPass').value.trim();
+  if(!USERS[u])return alert("اليوزر مش موجود");
+  if(USERS[u].pass!==p)return alert("الباسورد غلط");
+  CUR=u;
+  DB=USERS[u].data;
+  sessionStorage.setItem('amal_cur',u);
+  hideLogin();
+  app.applySet();
+  app.render()
+}
+function authCreate() {
+  let u=document.getElementById('uName').value.trim(),
+  p=document.getElementById('uPass').value.trim();
+  if(!u||!p)return alert("اكتب يوزر وباسورد");
+  if(USERS[u])return alert("موجود قبل كده");
+  USERS[u]= {
+    pass:p,
+    data:fresh()
+  }
+  ;
+  CUR=u;
+  DB=USERS[u].data;
+  localStorage.setItem('amal_users',JSON.stringify(USERS));
+  sessionStorage.setItem('amal_cur',u);
+  hideLogin();
+  app.render()
+}
+function authLogout() {
+  sessionStorage.removeItem('amal_cur');
+  CUR="";
+  DB=fresh();
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('userBar').textContent="غير مسجل"
+}
+function hideLogin() {
+  document.getElementById('loginScreen').style.display='none'
+}
+// 3- الواجهة
+const app= {
+  go(id) {
+    document.querySelectorAll('.card').forEach(card=>card.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.topBar button').forEach(button=>button.classList.toggle('activeGold',button.getAttribute('onclick')?.includes(`'${id}'`)));
+    this.render();
+  }
+  ,
+  settings() {
+    let p=prompt("باسورد الاعدادات");
+    if(p===DB.settings.pass)this.go('settings');
+    else if(p)alert("غلط")
+  }
+  ,
+  applySet() {
+    document.body.style.background=DB.settings.bg;
+    document.getElementById('mainTitle').textContent=DB.settings.name;
+    document.getElementById('setName').value=DB.settings.name;
+    document.getElementById('setBg').value=DB.settings.bg
+  }
+  ,
+  saveSet() {
+    DB.settings.name=document.getElementById('setName').value;
+    DB.settings.bg=document.getElementById('setBg').value;
+    saveAll();
+    this.applySet();
+    alert("تم")
+  }
+  ,
+  render() {
+    drawDivs();
+    drawAffairs();
+    drawFees()
+  }
+  ,
+  closeMenus() {
+    document.querySelectorAll('.moreList').forEach(m=>m.classList.remove('show'))
+  }
+}
+;
+document.addEventListener('click',e=> {
+  if(!e.target.closest('.moreWrap')) app.closeMenus();
+  const modal=document.getElementById('stuModal');
+  if(e.target===modal) student.close();
+}
+);
+// 4- QR
+const qrUtil= {
+  draw(el,code) {
+    el.innerHTML="";
+    try {
+      let q=qrcode(0,'M');
+      q.addData(code);
+      q.make();
+      el.innerHTML=q.createSvgTag(3,5);
+      let s=el.querySelector('svg');
+      if(s) {
+        s.style.width='70px';
+        s.style.height='70px';
+        s.style.background='#fff'
+      }
+    } catch {
+      el.textContent=code
+    }
+  }
+  ,
+  svg(code) {
+    let q=qrcode(0,'M');
+    q.addData(code);
+    q.make();
+    return q.createSvgTag(4,6)
+  }
+}
+;
+function divLabel(v) {
+  return v==='general'?'شعبة عامة':v==='labs'?'تحاليل':'تمريض'
+}
+// 5- الطالب
+const student= {
+  open() {
+    document.getElementById('editId').value="";
+    ['s_name','s_band','s_phone','s_guard','s_parent','s_nid','s_dob','s_addr'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('s_div').value='';
+    document.getElementById('s_gender').value='';
+    document.getElementById('s_photo').value='';
+    document.getElementById('s_prev').style.display='none';
+    tmpPhoto='';
+    document.getElementById('stuModal').classList.add('open');
+  }
+  ,
+  close() {
+    document.getElementById('stuModal').classList.remove('open')
+  }
+  ,
+  edit(id) {
+    let s=DB.students.find(x=>x.id===id);
+    if(!s)return;
+    document.getElementById('editId').value=id;
+    document.getElementById('s_name').value=s.name;
+    document.getElementById('s_div').value=s.division;
+    document.getElementById('s_band').value=s.band;
+    document.getElementById('s_phone').value=s.phone;
+    document.getElementById('s_guard').value=s.guardian;
+    document.getElementById('s_parent').value=s.parent;
+    document.getElementById('s_nid').value=s.nid;
+    document.getElementById('s_gender').value=s.gender;
+    document.getElementById('s_dob').value=s.dob;
+    document.getElementById('s_addr').value=s.address;
+    tmpPhoto=s.photo||"";
+    let im=document.getElementById('s_prev');
+    if(tmpPhoto) {
+      im.src=tmpPhoto;
+      im.style.display='block'
+    } else im.style.display='none';
+    document.getElementById('stuModal').classList.add('open')
+  }
+  ,
+  save() {
+    let name=document.getElementById('s_name').value.trim(),
+    div=document.getElementById('s_div').value;
+    if(!name||!div)return alert("الاسم والشعبة مطلوبين");
+    let d= {
+      name,
+      division:div,
+      band:document.getElementById('s_band').value,
+      phone:document.getElementById('s_phone').value,
+      guardian:document.getElementById('s_guard').value,
+      parent:document.getElementById('s_parent').value,
+      nid:document.getElementById('s_nid').value,
+      gender:document.getElementById('s_gender').value,
+      dob:document.getElementById('s_dob').value,
+      address:document.getElementById('s_addr').value,
+      photo:tmpPhoto
+    }
+    ;
+    let eid=document.getElementById('editId').value;
+    if(eid) {
+      let o=DB.students.find(x=>x.id==eid);
+      if(o)Object.assign(o,d)
+    } else {
+      d.id=Date.now();
+      d.code="AM"+Date.now().toString().slice(-6);
+      DB.students.push(d)
+    }
+    saveAll();
+    this.close();
+    app.render()
+  }
+  ,
+  del(id) {
+    if(confirm("متأكد تحذف؟")) {
+      DB.students=DB.students.filter(s=>s.id!==id);
+      saveAll();
+      app.render()
+    }
+  }
+}
+;
+document.getElementById('s_photo').addEventListener('change',e=> {
+  let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=> {
+    tmpPhoto=ev.target.result;let im=document.getElementById('s_prev');im.src=tmpPhoto;im.style.display='block'
+  }
+  ;r.readAsDataURL(f)
+}
+);
+// 6- الجداول
+function drawDivs() {
+  ['general','labs','nursing'].forEach(div=> {
+    let tb=document.getElementById('tb_'+div);if(!tb)return;tb.innerHTML="";let list=DB.students.filter(s=>s.division===div);let c=document.getElementById('c_'+div);if(c)c.textContent="("+list.length+")";list.forEach(s=> {
+      let tr=document.createElement('tr');tr.innerHTML=`<td>${s.photo?`<img class="photo" src="${s.photo}">`:'-'}</td><td>${s.code}</td><td>${s.name}</td><td>${s.band||'-'}</td><td>${s.phone||'-'}</td>`;let tdQr=document.createElement('td');qrUtil.draw(tdQr,s.code);tr.appendChild(tdQr);let tdAct=document.createElement('td');tdAct.innerHTML=`<div class="moreWrap"><button class="moreBtn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button><div class="moreList"><button onclick="student.edit(${s.id})">✏️ تعديل</button><button onclick="printer.one('${s.code}','${s.name}')">🖨️ طباعة الكارت</button><button onclick="student.del(${s.id})" style="color:#ff6b6b">🗑️ حذف</button></div></div>`;tr.appendChild(tdAct);tb.appendChild(tr)
+    }
+    )
+  }
+  )
+}
+const selector= {
+  toggle(code,chk) {
+    if(chk)picked.add(code);
+    else picked.delete(code)
+  }
+  ,
+  all(chk) {
+    let boxes=document.querySelectorAll('#tb_affairs input[type=checkbox]');
+    boxes.forEach(b=> {
+      b.checked=chk;this.toggle(b.dataset.code,chk)
+    }
+    );
+    if(!chk)picked.clear();
+    else DB.students.forEach(s=>picked.add(s.code))
+  }
+  ,
+  get24() {
+    const arr=DB.students.filter(studentRecord=>picked.has(studentRecord.code));
+    if(arr.length>24) {
+      alert('يمكن اختيار 24 طالبًا فقط في كل مرة');
+      return [];
+    }
+    if(!arr.length) {
+      alert('حدد طالبًا واحدًا على الأقل للطباعة');
+      return [];
+    }
+    return arr;
+  }
+}
+;
+function drawAffairs() {
+  let q=(document.getElementById('search').value||"").toLowerCase().trim();
+  let tb=document.getElementById('tb_affairs');
+  tb.innerHTML="";
+  DB.students.forEach(s=> {
+    let all=(s.name+" "+s.phone+" "+s.code).toLowerCase();if(q&&!all.includes(q))return;let tr=document.createElement('tr');tr.innerHTML=`<td><input type="checkbox" data-code="${s.code}" ${picked.has(s.code)?'checked':''} onchange="selector.toggle(this.dataset.code,this.checked)"></td><td>${s.photo?`<img class="photo" src="${s.photo}">`:'-'}</td><td>${s.code}</td><td>${s.name}</td><td>${divLabel(s.division)}</td><td>${s.phone||'-'}</td>`;let tdQr=document.createElement('td');qrUtil.draw(tdQr,s.code);tr.appendChild(tdQr);let tdAct=document.createElement('td');tdAct.innerHTML=`<div class="moreWrap"><button class="moreBtn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button><div class="moreList"><button onclick="student.edit(${s.id})">✏️ تعديل</button><button onclick="attend(${s.id},'present')">✅ حضور</button><button onclick="attend(${s.id},'absent')">❌ غياب</button><button onclick="printer.one('${s.code}','${s.name}')">🖨️ طباعة</button><button onclick="student.del(${s.id})" style="color:#ff6b6b">🗑️ حذف</button></div></div>`;tr.appendChild(tdAct);tb.appendChild(tr)
+  }
+  );
+  let sel=document.getElementById('repSel'),
+  fsel=document.getElementById('feeStu');
+  let old=sel.value,
+  old2=fsel.value;
+  sel.innerHTML='<option value="">اختار طالب</option>';
+  fsel.innerHTML='<option value="">اختار طالب</option>';
+  DB.students.forEach(s=> {
+    let o=document.createElement('option');o.value=s.id;o.textContent=s.code+" - "+s.name;sel.appendChild(o);let o2=document.createElement('option');o2.value=s.id;o2.textContent=s.name;fsel.appendChild(o2)
+  }
+  );
+  if(old)sel.value=old;
+  if(old2)fsel.value=old2
+}
+// 7- الطباعة
+const printer= {
+  one(code,name) {
+    let w=window.open("","_blank");
+    w.document.write(`<html dir="rtl"><body style="text-align:center;font-family:Tahoma"><h2>${DB.settings.name}</h2><p>${name}</p><div>${qrUtil.svg(code)}</div><p>${code}</p><script>setTimeout(()=>window.print(),500)<\/script></body></html>`);
+    w.document.close()
+  }
+  ,
+  print24() {
+    const list=selector.get24();
+    if(!list.length)return;
+    const win=window.open('','_blank');
+    if(!win) {
+      alert('اسمح بفتح النوافذ المنبثقة لإتمام الطباعة');
+      return;
+    }
+    const cards=list.map(record=>`
+    <article class="barcode-card">
+      <div class="qr">${qrUtil.svg(record.code)}</div>
+      <strong>${escapeHTML(record.name)}</strong>
+      <span>${escapeHTML(record.code)}</span>
+      <small>${divLabel(record.division)}</small>
+    </article>`).join('');
+    win.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+    <title>باركود الطلاب</title><style>
+    @page{size:A4 portrait;margin:6mm}
+    *{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;margin:0;color:#111}
+    h3{text-align:center;font-size:15px;margin:0 0 5mm}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:42mm;gap:2mm}
+    .barcode-card{border:1px solid #555;border-radius:2mm;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;text-align:center;padding:1.5mm;overflow:hidden}
+    .qr svg{width:25mm;height:25mm;display:block}
+    strong{font-size:9pt;max-width:100%;overflow-wrap:anywhere;margin-top:1mm}
+    span{font-size:8pt;margin-top:1mm}small{font-size:7pt;margin-top:1mm}
+    </style></head><body><h3>${escapeHTML(DB.settings.name)} — باركود ${list.length} طالب</h3>
+    <main class="grid">${cards}</main><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script>
+    </body></html>`);
+    win.document.close();
+  }
+}
+;
+// 8- حضور
+function attend(id,status) {
+  let s=DB.students.find(x=>x.id===id);
+  if(!s)return;
+  let today=new Date().toISOString().slice(0,10);
+  DB.attendance=DB.attendance.filter(a=>!(a.studentId===id&&a.date===today));
+  DB.attendance.push( {
+    studentId:id,date:today,time:new Date().toLocaleTimeString('ar-EG'),status
+  }
+  );
+  saveAll();
+  let bm=document.getElementById('bigMsg');
+  bm.innerHTML=(status==='present'?'حضر':'غاب')+"<br>"+s.name;
+  bm.style.display='flex';
+  setTimeout(()=>bm.style.display='none',2200);
+  report.show()
+}
+// 9- الكاميرا وقراءة QR
+const scanner =  {
+  stream: null,
+  async openCam()  {
+    const video = document.getElementById('cam');
+    video.style.display = 'block';
+    if (!navigator.mediaDevices?.getUserMedia)  {
+      alert('الكاميرا غير متاحة هنا. استخدم رفع صورة QR.');
+      return;
+    }
+    try  {
+      this.stream = await navigator.mediaDevices.getUserMedia( {
+        video:  {
+          facingMode: 'environment'
+        }
+      }
+      );
+      video.srcObject = this.stream;
+      await video.play();
+      this.scanLoop();
+    } catch (error)  {
+      alert('تعذر تشغيل الكاميرا. تأكد من السماح باستخدامها.');
+    }
+  }
+  ,
+  scanLoop()  {
+    if (!this.stream) return;
+    const video = document.getElementById('cam');
+    const canvas = document.getElementById('can');
+    const ctx = canvas.getContext('2d',  {
+      willReadFrequently: true
+    }
+    );
+    const scan = () =>  {
+      if (!this.stream) return;
+      if (video.readyState === video.HAVE_ENOUGH_DATA)  {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const result = window.jsQR?.(image.data, image.width, image.height);
+        if (result)  {
+          this.stop();
+          const studentRecord = DB.students.find(item => item.code === result.data.trim());
+          if (studentRecord) attend(studentRecord.id, 'present');
+          else alert('الرمز غير مسجل في قاعدة البيانات');
+          return;
+        }
+      }
+      requestAnimationFrame(scan);
+    }
+    ;
+    requestAnimationFrame(scan);
+  }
+  ,
+  stop()  {
+    this.stream?.getTracks().forEach(track => track.stop());
+    this.stream = null;
+    const video = document.getElementById('cam');
+    video.srcObject = null;
+    video.style.display = 'none';
+  }
+}
+;
+// 10- رفع صورة QR وقراءتها
+document.getElementById('qrFile').addEventListener('change', event =>  {
+  const file = event.target.files[0];
+  if (!file || !window.jsQR) return;
+  const image = new Image();
+  image.onload = () =>  {
+    const canvas = document.getElementById('can');
+    const context = canvas.getContext('2d',  {
+      willReadFrequently: true
+    }
+    );
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+    const result = jsQR(pixels.data, pixels.width, pixels.height);
+    if (!result) return alert('لم يتم العثور على QR واضح في الصورة');
+    const record = DB.students.find(item => item.code === result.data.trim());
+    if (record) attend(record.id, 'present');
+    else alert('الرمز غير مسجل');
+  }
+  ;
+  image.src = URL.createObjectURL(file);
+  event.target.value = '';
+}
+);
+// أدوات الطباعة المشتركة: فتح نافذة مستقلة بتنسيق مناسب للطباعة.
+function openPrintPage(title, content) {
+  const win = window.open('', '_blank', 'width=900,height=700');
+  if (!win) return alert('اسمح بفتح النوافذ المنبثقة حتى تتمكن من الطباعة.');
+  win.document.open();
+  win.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${escapeHTML(title)}</title>
+  <style>*{box-sizing:border-box}body{font-family:Tahoma,Arial;color:#111;margin:0;padding:24px;line-height:1.8}.paper{max-width:850px;margin:auto;border:1px solid #bbb;padding:24px}h1,h2{text-align:center;margin:0 0 8px}h1{font-size:23px}h2{font-size:18px;color:#444}.meta{text-align:center;color:#555;margin:12px 0 22px;border-bottom:2px solid #222;padding-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.item{border:1px solid #ccc;padding:10px;border-radius:5px;break-inside:avoid}.item small{display:block;color:#666}.item strong{font-size:16px}.footer{margin-top:28px;display:flex;justify-content:space-between;border-top:1px dashed #888;padding-top:12px}@media print{body{padding:0}.paper{border:0;padding:8mm;max-width:none}}</style></head><body><main class="paper">${content}</main><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
+  win.document.close();
+}
+
+// 11- التقارير
+const report =  {
+  show()  {
+    const id = Number(document.getElementById('repSel').value);
+    const target = document.getElementById('repBox');
+    const record = DB.students.find(item => item.id === id);
+    if (!record)  {
+      target.textContent = 'اختار طالب';
+      return;
+    }
+    const logs = DB.attendance.filter(item => item.studentId === id);
+    const present = logs.filter(item => item.status === 'present').length;
+    const absent = logs.filter(item => item.status === 'absent').length;
+    target.innerHTML = `
+      <div class="reportGrid">
+        <div><small>اسم الطالب</small><strong>${escapeHTML(record.name)}</strong></div>
+        <div><small>الكود</small><strong>${escapeHTML(record.code)}</strong></div>
+        <div><small>الشعبة</small><strong>${divLabel(record.division)}</strong></div>
+        <div><small>رقم الهاتف</small><strong>${escapeHTML(record.phone || '-')}</strong></div>
+        <div><small>مرات الحضور</small><strong>${present}</strong></div>
+        <div><small>مرات الغياب</small><strong>${absent}</strong></div>
+      </div>`;
+  },
+  // طباعة تقرير الطالب المختار وملخص الحضور والغياب.
+  print() {
+    const id = Number(document.getElementById('repSel').value);
+    const record = DB.students.find(item => item.id === id);
+    if (!record) return alert('اختار الطالب أولاً لطباعة تقريره');
+    const logs = DB.attendance.filter(item => item.studentId === id);
+    const present = logs.filter(item => item.status === 'present').length;
+    const absent = logs.filter(item => item.status === 'absent').length;
+    const content = `<h1>${escapeHTML(DB.settings.name || 'منظومة الأمل للتدريب')}</h1><h2>تقرير بيانات طالب</h2>
+      <div class="meta">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')}</div><section class="grid">
+      <div class="item"><small>اسم الطالب</small><strong>${escapeHTML(record.name)}</strong></div>
+      <div class="item"><small>كود الطالب</small><strong>${escapeHTML(record.code)}</strong></div>
+      <div class="item"><small>الشعبة</small><strong>${escapeHTML(divLabel(record.division))}</strong></div>
+      <div class="item"><small>الفرقة</small><strong>${escapeHTML(record.band || '-')}</strong></div>
+      <div class="item"><small>رقم الهاتف</small><strong>${escapeHTML(record.phone || '-')}</strong></div>
+      <div class="item"><small>مرات الحضور</small><strong>${present}</strong></div>
+      <div class="item"><small>مرات الغياب</small><strong>${absent}</strong></div>
+      <div class="item"><small>إجمالي التسجيلات</small><strong>${logs.length}</strong></div></section>
+      <div class="footer"><span>توقيع المسؤول: ........................</span><span>ختم الأكاديمية: ........................</span></div>`;
+    openPrintPage('تقرير الطالب - ' + record.name, content);
+  }
+}
+;
+// 12- إدارة الأقساط
+const fees =  {
+  save()  {
+    const studentId = Number(document.getElementById('feeStu').value);
+    const total = Number(document.getElementById('feeTotal').value);
+    const paid = Number(document.getElementById('feePaid').value);
+    const date = document.getElementById('feeDate').value;
+    if (!studentId || !total || paid < 0 || paid > total || !date)  {
+      alert('راجع بيانات القسط: الطالب والإجمالي والمدفوع والتاريخ');
+      return;
+    }
+    DB.fees.push( {
+      id: Date.now(), studentId, total, paid, date
+    }
+    );
+    saveAll();
+    document.getElementById('feeTotal').value = '';
+    document.getElementById('feePaid').value = '';
+    app.render();
+  }
+  ,
+  // طباعة إيصال القسط مع اسم الطالب والمبلغ المدفوع والمتبقي.
+  print(id) {
+    const fee = DB.fees.find(item => item.id === id);
+    if (!fee) return alert('تعذر العثور على بيانات القسط');
+    const record = DB.students.find(item => item.id === fee.studentId);
+    if (!record) return alert('الطالب المرتبط بهذا القسط غير موجود');
+    const remaining = Number(fee.total) - Number(fee.paid);
+    const content = `<h1>${escapeHTML(DB.settings.name || 'منظومة الأمل للتدريب')}</h1><h2>إيصال قسط طالب</h2>
+      <div class="meta">رقم الإيصال: ${fee.id} | تاريخ السداد: ${escapeHTML(fee.date)}</div><section class="grid">
+      <div class="item"><small>اسم الطالب</small><strong>${escapeHTML(record.name)}</strong></div>
+      <div class="item"><small>كود الطالب</small><strong>${escapeHTML(record.code)}</strong></div>
+      <div class="item"><small>رقم الهاتف</small><strong>${escapeHTML(record.phone || '-')}</strong></div>
+      <div class="item"><small>إجمالي المصروفات</small><strong>${Number(fee.total).toLocaleString('ar-EG')}</strong></div>
+      <div class="item"><small>المبلغ المدفوع</small><strong>${Number(fee.paid).toLocaleString('ar-EG')}</strong></div>
+      <div class="item"><small>المبلغ المتبقي</small><strong>${remaining.toLocaleString('ar-EG')}</strong></div></section>
+      <div class="footer"><span>توقيع المستلم: ........................</span><span>توقيع ولي الأمر: ........................</span></div>`;
+    openPrintPage('إيصال قسط - ' + record.name, content);
+  },
+  del(id)  {
+    if (!confirm('هل تريد حذف القسط؟')) return;
+    DB.fees = DB.fees.filter(item => item.id !== id);
+    saveAll();
+    app.render();
+  }
+}
+;
+function drawFees()  {
+  const body = document.getElementById('tb_fees');
+  if (!body) return;
+  const query = (document.getElementById('feeSearch')?.value || '').trim().toLowerCase();
+  body.innerHTML = '';
+  let overdue = 0;
+  DB.fees.forEach((fee, index) =>  {
+    const record = DB.students.find(item => item.id === fee.studentId);
+    if (!record) return;
+    if (query && !(record.name + ' ' + record.phone).toLowerCase().includes(query)) return;
+    const remaining = Number(fee.total) - Number(fee.paid);
+    if (remaining > 0) overdue += 1;
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td><td>${escapeHTML(record.name)}</td>
+      <td>${escapeHTML(record.phone || '-')}</td><td>${fee.total}</td>
+      <td>${fee.paid}</td><td>${remaining}</td><td>${escapeHTML(fee.date)}</td>
+      <td><div class="moreWrap"><button class="moreBtn" aria-label="إجراءات القسط" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button>
+      <div class="moreList"><button onclick="fees.print(${fee.id})">🖨️ طباعة إيصال القسط</button><button onclick="fees.del(${fee.id})">🗑️ حذف القسط</button></div></div></td>`;
+    body.appendChild(row);
+  }
+  );
+  const alertBox = document.getElementById('feeAlert');
+  alertBox.style.display = overdue ? 'block' : 'none';
+  alertBox.textContent = overdue ? `يوجد ${overdue} قسط/أقساط بها مبلغ متبقٍ.` : '';
+}
+// 13- إنشاء الحسابات واستيراد نسخة الحسابات
+document.getElementById('importAcc').addEventListener('change', event =>  {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () =>  {
+    try  {
+      const imported = JSON.parse(reader.result);
+      if (!imported || typeof imported !== 'object' || Array.isArray(imported)) throw new Error('invalid');
+      USERS =  {
+        ...USERS, ...imported
+      }
+      ;
+      localStorage.setItem('amal_users', JSON.stringify(USERS));
+      alert('تم استيراد الحسابات بنجاح');
+    } catch  {
+      alert('ملف النسخة الاحتياطية غير صالح');
+    }
+  }
+  ;
+  reader.readAsText(file);
+}
+);
+// 14- أدوات مساعدة وتهيئة التطبيق
+function escapeHTML(value)  {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    student.close();
+    app.closeMenus();
+    scanner.stop();
+  }
+});
+
+// بدء التشغيل واستعادة الجلسة عند وجودها
+(function initializeApp() {
+  if (CUR && USERS[CUR]?.data) {
+    DB = USERS[CUR].data;
+    DB.students ||= [];
+    DB.fees ||= [];
+    DB.attendance ||= [];
+    DB.settings ||= fresh().settings;
+    hideLogin();
+    app.applySet();
+    app.render();
+  } else {
+    CUR = '';
+    sessionStorage.removeItem('amal_cur');
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+})();
 </script>
 </body>
 </html>
