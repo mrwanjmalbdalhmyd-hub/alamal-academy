@@ -1351,5 +1351,24 @@ document.addEventListener('keydown', event => {
 </script>
 
 <div class="footerBar no-print">تم تصميم هذا النظام بواسطة <strong>مروان جمال عبد الحميد</strong> ت/ <a href="tel:01019876905">01019876905</a></div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSXqnQLZRZgwa4K5as1Nj_GXjgs8h1z1k",
+    authDomain: "academy-attendance-d5a88.firebaseapp.com",
+    projectId: "academy-attendance-d5a88",
+    storageBucket: "academy-attendance-d5a88.firebasestorage.app",
+    messagingSenderId: "1049112680070",
+    appId: "1:1049112680070:web:c88a336a62886b4fae2307"
+  };
+  const appFB = initializeApp(firebaseConfig);
+  const db = getFirestore(appFB);
+  const cloudRef = doc(db, "أمل", "أمل");
+  window.saveAllCloud = async function(){ await setDoc(cloudRef, {طلاب: DB.students||[], حضور: DB.attendance||[], مصاريف: DB.fees||[], بيانات: DB, lastUpdate: new Date().toISOString()}, {merge:true}); console.log("✅ حفظ سحابي"); }
+  window.loadFromCloud = async function(){ try{ const s=await getDoc(cloudRef); if(s.exists()){ const d=s.data(); DB.students=d.طلاب||[]; DB.attendance=d.حضور||[]; DB.fees=d.مصاريف||[]; app.applySet(); app.render(); } }catch(e){ console.error(e); } }
+  const oldSave = window.saveAll; window.saveAll = function(){ if(oldSave) oldSave(); saveAllCloud(); }
+  setTimeout(loadFromCloud, 1000);
+</script>
 </body>
 </html>
