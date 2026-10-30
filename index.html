@@ -550,8 +550,28 @@ header  {
     display:none!important
   }
 }
+
+
+.footerBar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(90deg,#101722,#172231);border-top:1px solid #2e3d51;color:#94a3b8;text-align:center;padding:8px 10px;font-size:12px;z-index:999;backdrop-filter:blur(8px)}
+.footerBar strong{color:#d8bd83}
+.footerBar a{color:#22c55e;text-decoration:none;font-weight:800}
+body{padding-bottom:40px}
+
+/* === إضافات الحضور والغياب === */
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;display:inline-block;min-width:55px}
+.badge-present{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}
+.badge-absent{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}
+.badge-none{background:#1e293b;color:#94a3b8;border:1px solid #334155}
+.donutWrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.donut{width:110px;height:110px;border-radius:50%;position:relative;display:grid;place-items:center;flex-shrink:0}
+.donutCenter{width:64px;height:64px;background:#101722;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#cbd5e1;border:1px solid #2a3a4f}
+.statItem{display:flex;align-items:center;gap:6px;font-size:13px;margin:6px 0}
+.statDot{width:10px;height:10px;border-radius:50%;display:inline-block}
+#attendanceDashboard{background:linear-gradient(135deg,#172231,#121b29);border:1px solid #2e3d51;border-radius:14px;padding:14px;margin:12px 0;display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center}
+@media(max-width:500px){#attendanceDashboard{grid-template-columns:1fr}}
 </style>
 </head>
+
 <body>
 <div id="loginScreen"><div class="loginBox"><h2>الأمل للتدريب</h2><input id="uName" placeholder="اليوزر"><input id="uPass" type="password" placeholder="الباسورد"><button class="btn btn-gold" onclick="authLogin()">دخول</button><button class="btn btn-blue" onclick="authCreate()" style="margin-top:6px">إنشاء حساب جديد</button><div style="margin-top:10px"><input type="file" id="importAcc" accept=".json"></div></div></div>
 <div id="bigMsg"></div>
@@ -566,15 +586,30 @@ header  {
 <button onclick="app.go('fees')">الأقساط</button>
 <button onclick="app.settings()">الاعدادات</button>
 </div>
-<div id="general" class="card"><h3>شعبة عامة <span id="c_general"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_general"></tbody></table></div></div>
-<div id="labs" class="card"><h3>تحاليل طبية <span id="c_labs"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_labs"></tbody></table></div></div>
-<div id="nursing" class="card"><h3>تمريض <span id="c_nursing"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_nursing"></tbody></table></div></div>
+<div id="general" class="card"><h3>شعبة عامة <span id="c_general"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>الحالة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_general"></tbody></table></div></div>
+<div id="labs" class="card"><h3>تحاليل طبية <span id="c_labs"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>الحالة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_labs"></tbody></table></div></div>
+<div id="nursing" class="card"><h3>تمريض <span id="c_nursing"></span></h3><div class="tableBox"><table><thead><tr><th>صورة</th><th>كود</th><th>اسم</th><th>فرقة</th><th>الحالة</th><th>فون</th><th>رمز</th><th>⋮</th></tr></thead><tbody id="tb_nursing"></tbody></table></div></div>
 <div id="affairs" class="card active">
 <div style="display:flex;gap:6px"><button class="btn btn-green" style="flex:1" onclick="student.open()">+ طالب جديد</button><button class="btn btn-blue" style="flex:1" onclick="scanner.openCam()">📷 مسح كاميرا</button><button class="btn btn-gold" style="flex:1" onclick="printer.print24()">🖨️ طباعة 24 محدد</button></div>
 <video id="cam" playsinline style="display:none;width:100%;border-radius:12px;margin-top:8px;border:1px solid #333"></video><canvas id="can" style="display:none"></canvas>
+
+<div id="attendanceDashboard">
+  <div class="donutWrap" style="justify-content:center">
+    <div id="attendanceDonut" class="donut"><div class="donutCenter" id="donutCenter">0%</div></div>
+  </div>
+  <div>
+    <div style="font-weight:800;color:var(--gold);margin-bottom:8px;font-size:14px">📊 حضور اليوم - <span id="todayDateLabel"></span></div>
+    <div class="statItem"><span class="statDot" style="background:#22c55e"></span> حاضر: <strong id="statPresent" style="color:#22c55e">0</strong></div>
+    <div class="statItem"><span class="statDot" style="background:#ef4444"></span> غائب: <strong id="statAbsent" style="color:#ef4444">0</strong></div>
+    <div class="statItem"><span class="statDot" style="background:#475569"></span> لم يسجل: <strong id="statNone">0</strong></div>
+    <div class="statItem" style="border-top:1px dashed #2e3d51;margin-top:6px;padding-top:6px"><span class="statDot" style="background:var(--gold)"></span> إجمالي الطلاب: <strong id="statTotal">0</strong></div>
+    <div style="display:flex;gap:6px;margin-top:8px"><button class="btn btn-green" style="padding:6px;font-size:11px" onclick="attendanceTools.markAllPresent()">✅ تحضير الكل</button><button class="btn btn-red" style="padding:6px;font-size:11px" onclick="attendanceTools.clearToday()">🗑️ مسح حضور اليوم</button></div>
+  </div>
+</div>
+
 <div style="display:flex;gap:6px;margin-top:8px"><input id="search" placeholder="ابحث بالاسم او الكود او الفون" oninput="app.render()"><label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" id="checkAll" onchange="selector.all(this.checked)"> اختيار الكل</label></div>
 <input type="file" id="qrFile" accept="image/*" style="margin-top:6px">
-<div class="tableBox"><table><thead><tr><th>✔</th><th>صورة</th><th>كود</th><th>اسم</th><th>شعبة</th><th>فون</th><th>رمز</th><th>اجراء</th></tr></thead><tbody id="tb_affairs"></tbody></table></div>
+<div class="tableBox"><table><thead><tr><th>✔</th><th>صورة</th><th>كود</th><th>اسم</th><th>شعبة</th><th>الحالة</th><th>فون</th><th>رمز</th><th>اجراء</th></tr></thead><tbody id="tb_affairs"></tbody></table></div>
 <h3>تقرير طالب</h3><select id="repSel" onchange="report.show()"></select><button class="btn btn-blue no-print" style="margin:8px 0" onclick="report.print()">🖨️ طباعة تقرير الطالب</button><div id="repBox" style="background:#0f0f0f;border:1px solid #222;padding:10px;border-radius:10px">اختار طالب</div>
 </div>
 <div id="fees" class="card"><h3>الأقساط</h3><div id="feeAlert" style="display:none;background:#2a0a0a;border:1px solid #5a1a1a;padding:10px;border-radius:10px;margin-bottom:8px"></div><select id="feeStu"></select><input id="feeTotal" type="number" placeholder="الاجمالي"><input id="feePaid" type="number" placeholder="المدفوع"><input id="feeDate" type="date"><button class="btn btn-green" onclick="fees.save()">حفظ القسط</button><input id="feeSearch" placeholder="ابحث في الاقساط" oninput="app.render()"><div class="tableBox"><table><thead><tr><th>#</th><th>الاسم</th><th>فون</th><th>كامل</th><th>دفع</th><th>باقي</th><th>معاد</th><th>⋮</th></tr></thead><tbody id="tb_fees"></tbody></table></div></div>
@@ -841,16 +876,32 @@ document.getElementById('s_photo').addEventListener('change',e=> {
   ;r.readAsDataURL(f)
 }
 );
-// 6- الجداول
+// 6- الجداول - مع حالة الحضور
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function getTodayStatus(studentId){
+  const today=todayStr();
+  const rec=DB.attendance.find(a=>a.studentId===studentId && a.date===today);
+  return rec ? rec.status : 'none';
+}
+function statusBadge(status){
+  if(status==='present') return '<span class="badge badge-present">✅ حاضر</span>';
+  if(status==='absent') return '<span class="badge badge-absent">❌ غائب</span>';
+  return '<span class="badge badge-none">— لم يسجل</span>';
+}
 function drawDivs() {
   ['general','labs','nursing'].forEach(div=> {
     let tb=document.getElementById('tb_'+div);if(!tb)return;tb.innerHTML="";let list=DB.students.filter(s=>s.division===div);let c=document.getElementById('c_'+div);if(c)c.textContent="("+list.length+")";list.forEach(s=> {
-      let tr=document.createElement('tr');tr.innerHTML=`<td>${s.photo?`<img class="photo" src="${s.photo}">`:'-'}</td><td>${s.code}</td><td>${s.name}</td><td>${s.band||'-'}</td><td>${s.phone||'-'}</td>`;let tdQr=document.createElement('td');qrUtil.draw(tdQr,s.code);tr.appendChild(tdQr);let tdAct=document.createElement('td');tdAct.innerHTML=`<div class="moreWrap"><button class="moreBtn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button><div class="moreList"><button onclick="student.edit(${s.id})">✏️ تعديل</button><button onclick="printer.one('${s.code}','${s.name}')">🖨️ طباعة الكارت</button><button onclick="student.del(${s.id})" style="color:#ff6b6b">🗑️ حذف</button></div></div>`;tr.appendChild(tdAct);tb.appendChild(tr)
+      const st=getTodayStatus(s.id);
+      let tr=document.createElement('tr');
+      tr.innerHTML=`<td>${s.photo?`<img class="photo" src="${s.photo}">`:'-'}</td><td>${s.code}</td><td>${s.name}</td><td>${s.band||'-'}</td><td>${statusBadge(st)}</td><td>${s.phone||'-'}</td>`;
+      let tdQr=document.createElement('td');qrUtil.draw(tdQr,s.code);tr.appendChild(tdQr);
+      let tdAct=document.createElement('td');tdAct.innerHTML=`<div class="moreWrap"><button class="moreBtn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button><div class="moreList"><button onclick="student.edit(${s.id})">✏️ تعديل</button><button onclick="attend(${s.id},'present')">✅ حضور</button><button onclick="attend(${s.id},'absent')">❌ غياب</button><button onclick="printer.one('${s.code}','${s.name}')">🖨️ طباعة الكارت</button><button onclick="student.del(${s.id})" style="color:#ff6b6b">🗑️ حذف</button></div></div>`;tr.appendChild(tdAct);tb.appendChild(tr)
     }
     )
   }
   )
 }
+
 const selector= {
   toggle(code,chk) {
     if(chk)picked.add(code);
@@ -881,15 +932,71 @@ const selector= {
   }
 }
 ;
+function drawAttendanceDashboard(){
+  const today=todayStr();
+  const total=DB.students.length;
+  const present=DB.attendance.filter(a=>a.date===today && a.status==='present').length;
+  const absent=DB.attendance.filter(a=>a.date===today && a.status==='absent').length;
+  const none=Math.max(0,total-present-absent);
+  const presentPct= total? Math.round((present/total)*100):0;
+  const absentPct= total? Math.round((absent/total)*100):0;
+  const nonePct= total? 100-presentPct-absentPct:0;
+
+  document.getElementById('statPresent').textContent=present;
+  document.getElementById('statAbsent').textContent=absent;
+  document.getElementById('statNone').textContent=none;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('todayDateLabel').textContent=new Date().toLocaleDateString('ar-EG');
+  document.getElementById('donutCenter').textContent= presentPct + '% حضور';
+
+  const donut=document.getElementById('attendanceDonut');
+  if(total===0){
+    donut.style.background='#1e293b';
+  } else {
+    // conic gradient: green present, red absent, gray none
+    let cur=0;
+    const p1=cur, p2=cur+presentPct;
+    cur=p2;
+    const p3=cur+absentPct;
+    donut.style.background=`conic-gradient(#22c55e ${p1}% ${p2}%, #ef4444 ${p2}% ${p3}%, #334155 ${p3}% 100%)`;
+  }
+}
+
+const attendanceTools={
+  markAllPresent(){
+    if(!DB.students.length) return alert('لا يوجد طلاب');
+    if(!confirm('تحضير كل الطلاب كـ حاضر اليوم؟')) return;
+    const today=todayStr();
+    DB.students.forEach(s=>{
+      DB.attendance=DB.attendance.filter(a=>!(a.studentId===s.id && a.date===today));
+      DB.attendance.push({studentId:s.id,date:today,time:new Date().toLocaleTimeString('ar-EG'),status:'present'});
+    });
+    saveAll(); app.render();
+  },
+  clearToday(){
+    if(!confirm('مسح كل حضور وغياب اليوم؟')) return;
+    const today=todayStr();
+    DB.attendance=DB.attendance.filter(a=>a.date!==today);
+    saveAll(); app.render();
+  }
+};
+
 function drawAffairs() {
+  drawAttendanceDashboard();
   let q=(document.getElementById('search').value||"").toLowerCase().trim();
   let tb=document.getElementById('tb_affairs');
   tb.innerHTML="";
   DB.students.forEach(s=> {
-    let all=(s.name+" "+s.phone+" "+s.code).toLowerCase();if(q&&!all.includes(q))return;let tr=document.createElement('tr');tr.innerHTML=`<td><input type="checkbox" data-code="${s.code}" ${picked.has(s.code)?'checked':''} onchange="selector.toggle(this.dataset.code,this.checked)"></td><td>${s.photo?`<img class="photo" src="${s.photo}">`:'-'}</td><td>${s.code}</td><td>${s.name}</td><td>${divLabel(s.division)}</td><td>${s.phone||'-'}</td>`;let tdQr=document.createElement('td');qrUtil.draw(tdQr,s.code);tr.appendChild(tdQr);let tdAct=document.createElement('td');tdAct.innerHTML=`<div class="moreWrap"><button class="moreBtn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button><div class="moreList"><button onclick="student.edit(${s.id})">✏️ تعديل</button><button onclick="attend(${s.id},'present')">✅ حضور</button><button onclick="attend(${s.id},'absent')">❌ غياب</button><button onclick="printer.one('${s.code}','${s.name}')">🖨️ طباعة</button><button onclick="student.del(${s.id})" style="color:#ff6b6b">🗑️ حذف</button></div></div>`;tr.appendChild(tdAct);tb.appendChild(tr)
+    let all=(s.name+" "+s.phone+" "+s.code).toLowerCase();if(q&&!all.includes(q))return;
+    const st=getTodayStatus(s.id);
+    let tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="checkbox" data-code="${s.code}" ${picked.has(s.code)?'checked':''} onchange="selector.toggle(this.dataset.code,this.checked)"></td><td>${s.photo?`<img class="photo" src="${s.photo}">`:'-'}</td><td>${s.code}</td><td>${s.name}</td><td>${divLabel(s.division)}</td><td>${statusBadge(st)}</td><td>${s.phone||'-'}</td>`;
+    let tdQr=document.createElement('td');qrUtil.draw(tdQr,s.code);tr.appendChild(tdQr);
+    let tdAct=document.createElement('td');tdAct.innerHTML=`<div class="moreWrap"><button class="moreBtn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show')">⋮</button><div class="moreList"><button onclick="student.edit(${s.id})">✏️ تعديل</button><button onclick="attend(${s.id},'present')">✅ حضور</button><button onclick="attend(${s.id},'absent')">❌ غياب</button><button onclick="printer.one('${s.code}','${s.name}')">🖨️ طباعة</button><button onclick="student.del(${s.id})" style="color:#ff6b6b">🗑️ حذف</button></div></div>`;tr.appendChild(tdAct);tb.appendChild(tr)
   }
   );
   let sel=document.getElementById('repSel'),
+
   fsel=document.getElementById('feeStu');
   let old=sel.value,
   old2=fsel.value;
@@ -906,7 +1013,9 @@ function drawAffairs() {
 const printer= {
   one(code,name) {
     let w=window.open("","_blank");
-    w.document.write(`<html dir="rtl"><body style="text-align:center;font-family:Tahoma"><h2>${DB.settings.name}</h2><p>${name}</p><div>${qrUtil.svg(code)}</div><p>${code}</p><script>setTimeout(()=>window.print(),500)<\/script></body></html>`);
+    w.document.write(`<html dir="rtl"><body style="text-align:center;font-family:Tahoma"><h2>${DB.settings.name}</h2><p>${name}</p><div>${qrUtil.svg(code)}</div><p>${code}</p><script>setTimeout(()=>window.print(),500)<\/script>
+<div class="footerBar no-print">تم تصميم هذا النظام بواسطة <strong>مروان جمال عبد الحميد</strong> ت/ <a href="tel:01019876905">01019876905</a></div>
+</body></html>`);
     w.document.close()
   }
   ,
@@ -938,7 +1047,9 @@ const printer= {
     span{font-size:8pt;margin-top:1mm}small{font-size:7pt;margin-top:1mm}
     </style></head><body><h3>${escapeHTML(DB.settings.name)} — باركود ${list.length} طالب</h3>
     <main class="grid">${cards}</main><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script>
-    </body></html>`);
+    
+<div class="footerBar no-print">تم تصميم هذا النظام بواسطة <strong>مروان جمال عبد الحميد</strong> ت/ <a href="tel:01019876905">01019876905</a></div>
+</body></html>`);
     win.document.close();
   }
 }
@@ -954,6 +1065,7 @@ function attend(id,status) {
   }
   );
   saveAll();
+  app.render();
   let bm=document.getElementById('bigMsg');
   bm.innerHTML=(status==='present'?'حضر':'غاب')+"<br>"+s.name;
   bm.style.display='flex';
@@ -1056,7 +1168,9 @@ function openPrintPage(title, content) {
   if (!win) return alert('اسمح بفتح النوافذ المنبثقة حتى تتمكن من الطباعة.');
   win.document.open();
   win.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${escapeHTML(title)}</title>
-  <style>*{box-sizing:border-box}body{font-family:Tahoma,Arial;color:#111;margin:0;padding:24px;line-height:1.8}.paper{max-width:850px;margin:auto;border:1px solid #bbb;padding:24px}h1,h2{text-align:center;margin:0 0 8px}h1{font-size:23px}h2{font-size:18px;color:#444}.meta{text-align:center;color:#555;margin:12px 0 22px;border-bottom:2px solid #222;padding-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.item{border:1px solid #ccc;padding:10px;border-radius:5px;break-inside:avoid}.item small{display:block;color:#666}.item strong{font-size:16px}.footer{margin-top:28px;display:flex;justify-content:space-between;border-top:1px dashed #888;padding-top:12px}@media print{body{padding:0}.paper{border:0;padding:8mm;max-width:none}}</style></head><body><main class="paper">${content}</main><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
+  <style>*{box-sizing:border-box}body{font-family:Tahoma,Arial;color:#111;margin:0;padding:24px;line-height:1.8}.paper{max-width:850px;margin:auto;border:1px solid #bbb;padding:24px}h1,h2{text-align:center;margin:0 0 8px}h1{font-size:23px}h2{font-size:18px;color:#444}.meta{text-align:center;color:#555;margin:12px 0 22px;border-bottom:2px solid #222;padding-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.item{border:1px solid #ccc;padding:10px;border-radius:5px;break-inside:avoid}.item small{display:block;color:#666}.item strong{font-size:16px}.footer{margin-top:28px;display:flex;justify-content:space-between;border-top:1px dashed #888;padding-top:12px}@media print{body{padding:0}.paper{border:0;padding:8mm;max-width:none}}</style></head><body><main class="paper">${content}</main><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script>
+<div class="footerBar no-print">تم تصميم هذا النظام بواسطة <strong>مروان جمال عبد الحميد</strong> ت/ <a href="tel:01019876905">01019876905</a></div>
+</body></html>`);
   win.document.close();
 }
 
@@ -1235,5 +1349,7 @@ document.addEventListener('keydown', event => {
   }
 })();
 </script>
+
+<div class="footerBar no-print">تم تصميم هذا النظام بواسطة <strong>مروان جمال عبد الحميد</strong> ت/ <a href="tel:01019876905">01019876905</a></div>
 </body>
 </html>
