@@ -2,8 +2,7 @@
 <!--
   منظومة الأمل للتدريب
   ملف الواجهة الرئيسي (HTML / CSS / JavaScript)
-  الأقسام موضحة بالتعليقات لتسهيل التطوير والصيانة.
-  تنبيه: بيانات التطبيق تُخزن محليًا في متصفح الجهاز.
+  مرتبط بقاعدة بيانات Firebase السحابية بتصميم شادو احترافي
 -->
 <html lang="ar" dir="rtl">
 <head>
@@ -12,13 +11,64 @@
 <title>منظومة الأمل للتدريب</title>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<!-- Firebase App & Firestore SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSXqnQLZRZgwa4K5as1Nj_GXjgs8h1z1k",
+    authDomain: "academy-attendance-d5a88.firebaseapp.com",
+    projectId: "academy-attendance-d5a88",
+    storageBucket: "academy-attendance-d5a88.firebasestorage.app",
+    messagingSenderId: "1049112680070",
+    appId: "1:1049112680070:web:c88a336a62886b4fae2307"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const db = getFirestore(firebaseApp);
+
+  window.cloudDB = {
+    async getUserData(username) {
+      try {
+        const docRef = doc(db, "users_data", username);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          return docSnap.data();
+        }
+        return null;
+      } catch (e) {
+        console.error("خطأ في جلب البيانات من السحابة:", e);
+        return null;
+      }
+    },
+    async saveUserData(username, data) {
+      try {
+        const docRef = doc(db, "users_data", username);
+        await setDoc(docRef, data);
+      } catch (e) {
+        console.error("خطأ في الحفظ بالسحابة:", e);
+        alert("فشل الحفظ السحابي، تأكد من الاتصال بالإنترنت ومن قواعد الأمان (Rules) في Firebase.");
+      }
+    }
+  };
+
+  if (typeof window.onFirebaseReady === 'function') {
+    window.onFirebaseReady();
+  }
+</script>
+
 <style>
 :root {
   --gold:#c6a15b;
-  --card:#171c26;
+  --gold-glow:rgba(198, 161, 91, 0.25);
+  --card:#151c27;
   --line:#2b3443;
   --blue:#315b88;
   --green:#287a62;
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.75), 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-md: 0 14px 35px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 * {
   box-sizing:border-box;
@@ -26,16 +76,17 @@
 }
 body {
   margin:0;
-  background:radial-gradient(ellipse at top, #202b3b 0%, #0b111b 62%, #080d15 100%);
+  background:radial-gradient(circle at top center, #1e293b 0%, #090e17 65%, #04070c 100%);
   color:#edf2f7;
   min-height:100vh;
-  padding-bottom:44px;
+  padding-bottom:54px;
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.85);
 }
 #loginScreen {
   position:fixed;
   inset:0;
-  background:rgba(2, 6, 12, .94);
-  backdrop-filter:blur(16px);
+  background:radial-gradient(circle at center, rgba(15, 23, 42, 0.88), rgba(2, 6, 12, 0.97));
+  backdrop-filter:blur(20px);
   z-index:9999;
   display:flex;
   align-items:center;
@@ -44,98 +95,112 @@ body {
 }
 .loginBox {
   width:100%;
-  max-width:380px;
-  background:#182231;
-  border:1px solid #34445a;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 24px 80px rgba(0, 0, 0, .75)
+  max-width:390px;
+  background:linear-gradient(145deg, #1b2536, #101722);
+  border:1px solid rgba(198, 161, 91, 0.35);
+  border-radius:22px;
+  padding:26px 22px;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.9), 0 0 30px rgba(198, 161, 91, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 .loginBox h2 {
   color:var(--gold);
   text-align:center;
-  margin:0 0 14px
+  margin:0 0 16px;
+  text-shadow: 0 4px 15px rgba(198, 161, 91, 0.4);
 }
 header {
-  background:rgba(14, 21, 32, .96);
+  background:linear-gradient(180deg, rgba(18, 26, 40, 0.98), rgba(11, 17, 27, 0.96));
   border-bottom:1px solid #354255;
-  padding:14px;
+  padding:16px;
   text-align:center;
   color:var(--gold);
   font-weight:800;
-  font-size:20px;
-  box-shadow:0 8px 30px rgba(0, 0, 0, .28);
+  font-size:21px;
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.65), inset 0 -1px 0 rgba(198, 161, 91, 0.2);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
 }
 #userBar {
   font-size:12px;
   text-align:center;
-  color:#94a3b8;
-  padding:6px;
-  background:#0e1520
+  color:#cbd5e1;
+  padding:7px;
+  background:#0a0f18;
+  border-bottom:1px solid #1e293b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 .wrap {
   max-width:1440px;
   margin:auto;
-  padding:14px 18px 30px
+  padding:16px 18px 34px
 }
 .topBar {
   display:grid;
   grid-template-columns:repeat(6, minmax(0, 1fr));
-  gap:7px;
-  padding:8px 0 12px;
+  gap:8px;
+  padding:8px 0 14px;
 }
 .topBar button {
   min-width:0;
-  padding:9px 4px;
+  padding:10px 4px;
   font-size:12px;
   font-weight:700;
-  border-radius:9px;
-  background:linear-gradient(180deg, #263449, #1a2637);
+  border-radius:11px;
+  background:linear-gradient(180deg, #243146, #151f2e);
   border:1px solid #3b4b60;
   color:#e7edf5;
   cursor:pointer;
-  transition:.2s;
-  box-shadow:0 4px 12px rgba(0, 0, 0, .18);
+  transition:.22s;
+  box-shadow: var(--shadow-sm);
 }
 .topBar button.activeGold {
-  background:linear-gradient(180deg, #d8bd83, #b48a45);
-  color:#171717;
-  border-color:#d8bd83;
+  background:linear-gradient(180deg, #e0c589, #b48a45);
+  color:#111;
+  border-color:#f3dca6;
+  box-shadow: 0 10px 25px rgba(198, 161, 91, 0.35), 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 .topBar button:hover {
-  transform:translateY(-1px);
-  border-color:var(--gold)
+  transform:translateY(-2px);
+  border-color:var(--gold);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
 }
 .card {
-  background:linear-gradient(145deg, #1b2431, #151c27);
-  border:1px solid #344153;
-  border-radius:14px;
-  padding:14px;
-  margin-top:12px;
+  background:linear-gradient(145deg, #1b2432, #121822);
+  border:1px solid #334155;
+  border-radius:18px;
+  padding:18px;
+  margin-top:14px;
   display:none;
-  box-shadow:0 16px 42px rgba(0, 0, 0, .38), 0 2px 8px rgba(0, 0, 0, .22);
+  box-shadow: var(--shadow-lg);
 }
 .card.active {
   display:block;
-  animation:pop .2s
+  animation:pop .25s ease-out
 }
 @keyframes pop {
-  from { opacity:0; transform:translateY(8px) }
-  to { opacity:1; transform:translateY(0) }
+  from { opacity:0; transform:translateY(10px) scale(0.99) }
+  to { opacity:1; transform:translateY(0) scale(1) }
 }
 h3 {
   color:var(--gold);
-  margin:6px 0 10px
+  margin:6px 0 12px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 input, select, textarea {
   width:100%;
-  padding:10px;
-  margin:4px 0;
-  border-radius:9px;
+  padding:11px;
+  margin:5px 0;
+  border-radius:10px;
   border:1px solid #2e3c50;
-  background:#0f1622;
+  background:#0b111b;
   color:#fff;
-  font-size:14px
+  font-size:14px;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.65), 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:.2s;
+}
+input:focus, select:focus, textarea:focus {
+  outline:none;
+  border-color:var(--gold);
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.65), 0 0 12px rgba(198, 161, 91, 0.25);
 }
 input[readonly] {
   background:#152033;
@@ -145,43 +210,44 @@ input[readonly] {
 }
 .btn {
   width:100%;
-  padding:10px 12px;
-  border-radius:10px;
+  padding:11px 14px;
+  border-radius:11px;
   border:none;
   font-weight:800;
   cursor:pointer;
-  margin:4px 0;
-  box-shadow:0 4px 12px rgba(0, 0, 0, .18);
-  transition:.15s;
+  margin:5px 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition:.18s;
 }
-.btn:hover { opacity:.92; transform:translateY(-1px); }
-.btn-gold { background:linear-gradient(135deg, #d9bd82, #b58a45); color:#111 }
-.btn-blue { background:linear-gradient(135deg, #416d9e, #294c73); color:#fff }
-.btn-green { background:linear-gradient(135deg, #32866d, #21634f); color:#fff }
-.btn-red { background:linear-gradient(135deg, #dc2626, #991b1b); color:#fff }
-.btn-purple { background:linear-gradient(135deg, #7c3aed, #5b21b6); color:#fff }
-.btn-teal { background:linear-gradient(135deg, #0d9488, #115e59); color:#fff }
+.btn:hover { opacity:.95; transform:translateY(-2px); box-shadow: 0 12px 26px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25); }
+.btn:active { transform:translateY(0); }
+.btn-gold { background:linear-gradient(135deg, #e0c488, #b58a45); color:#111 }
+.btn-blue { background:linear-gradient(135deg, #416d9e, #244468); color:#fff }
+.btn-green { background:linear-gradient(135deg, #32866d, #1d5846); color:#fff }
+.btn-red { background:linear-gradient(135deg, #dc2626, #8b1616); color:#fff }
+.btn-purple { background:linear-gradient(135deg, #7c3aed, #521ca6); color:#fff }
+.btn-teal { background:linear-gradient(135deg, #0d9488, #0f524d); color:#fff }
 
 .exportBar {
   display:flex;
-  gap:6px;
+  gap:8px;
   flex-wrap:wrap;
-  margin:8px 0;
+  margin:10px 0;
 }
 .exportBar button {
   flex:1;
   min-width:130px;
-  padding:8px 10px;
+  padding:9px 10px;
   font-size:12px;
 }
 
 .tableBox {
   overflow:auto;
-  border-radius:12px;
-  border:1px solid #2c3849;
+  border-radius:14px;
+  border:1px solid #334155;
   background:#fff;
-  margin-top:10px;
-  box-shadow:0 10px 28px rgba(0, 0, 0, .22)
+  margin-top:12px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 table {
   width:100%;
@@ -191,19 +257,20 @@ table {
   color:#111
 }
 th, td {
-  padding:9px 7px;
+  padding:10px 7px;
   font-size:12px;
   border:1px solid #e2e8f0;
   text-align:center;
   vertical-align:middle;
 }
 th {
-  background:#111827;
+  background:linear-gradient(180deg, #182232, #0f172a);
   color:var(--gold);
   position:sticky;
   top:0;
   z-index:2;
   font-weight:800;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 tbody tr:nth-child(even) {
   background:#f8fafc;
@@ -212,11 +279,12 @@ tbody tr:hover {
   background:#eff6ff;
 }
 .photo {
-  width:36px;
-  height:36px;
+  width:38px;
+  height:38px;
   border-radius:50%;
   object-fit:cover;
-  border:1px solid #cbd5e1
+  border:2px solid #cbd5e1;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 .moreBtn {
   width:34px;
@@ -230,20 +298,22 @@ tbody tr:hover {
   font-size:18px;
   line-height:1;
   transition:.15s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 .moreBtn:hover {
   background:#e2e8f0;
   border-color:#94a3b8;
+  transform:scale(1.05);
 }
 
-/* بطاقة ملخص القسط التلقائي */
 .feeSummaryBox {
-  background:linear-gradient(135deg, #111c2d, #18273e);
+  background:linear-gradient(135deg, #121e30, #182840);
   border:1px solid #354b6b;
-  border-radius:12px;
-  padding:12px;
-  margin:8px 0;
+  border-radius:14px;
+  padding:14px;
+  margin:10px 0;
   display:none;
+  box-shadow: var(--shadow-md);
 }
 .feeSummaryGrid {
   display:grid;
@@ -252,10 +322,11 @@ tbody tr:hover {
   text-align:center;
 }
 .feeStat {
-  background:#0c1421;
+  background:#0a111d;
   border:1px solid #263752;
-  border-radius:9px;
-  padding:8px 6px;
+  border-radius:10px;
+  padding:9px 6px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 .feeStat small {
   display:block;
@@ -271,12 +342,11 @@ tbody tr:hover {
   .feeSummaryGrid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
 
-/* الموديلات (Modals) */
 .modal {
   position:fixed;
   inset:0;
-  background:rgba(3, 8, 15, .82);
-  backdrop-filter:blur(13px);
+  background:rgba(2, 6, 12, .86);
+  backdrop-filter:blur(16px);
   display:none;
   align-items:center;
   justify-content:center;
@@ -291,12 +361,12 @@ tbody tr:hover {
   max-width:760px;
   max-height:94vh;
   overflow:auto;
-  background:linear-gradient(145deg, #202b3b, #141c28);
+  background:linear-gradient(145deg, #202b3b, #121924);
   border:1px solid #45546a;
-  border-radius:18px;
-  padding:18px;
+  border-radius:20px;
+  padding:20px;
   position:relative;
-  box-shadow:0 28px 90px rgba(0, 0, 0, .78), 0 0 0 1px rgba(255, 255, 255, .025);
+  box-shadow: 0 35px 100px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .06), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 .actionModalBox {
   width:min(94vw, 460px);
@@ -329,11 +399,13 @@ tbody tr:hover {
   font-size:18px;
   display:grid;
   place-items:center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 #bigMsg {
   position:fixed;
   inset:0;
-  background:rgba(0, 0, 0, .9);
+  background:rgba(0, 0, 0, .92);
+  backdrop-filter:blur(10px);
   display:none;
   align-items:center;
   justify-content:center;
@@ -341,30 +413,33 @@ tbody tr:hover {
   color:var(--gold);
   font-size:28px;
   font-weight:bold;
-  text-align:center
+  text-align:center;
+  text-shadow: 0 4px 20px rgba(198, 161, 91, 0.5);
 }
 .reportGrid {
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:8px
+  gap:9px
 }
 .reportGrid>div {
-  padding:9px;
+  padding:10px;
   border:1px solid #303e51;
-  border-radius:9px;
-  background:#172231
+  border-radius:10px;
+  background:#141e2c;
+  box-shadow: var(--shadow-sm);
 }
 .reportGrid small, .reportGrid strong { display:block }
 .reportGrid small { color:#9eacbf; margin-bottom:4px }
 .reportGrid strong { color:#f3f6fa }
 
 .noteItem {
-  background:#111926;
+  background:#101824;
   border:1px solid #2e3d51;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:8px;
+  border-radius:11px;
+  padding:11px;
+  margin-bottom:9px;
   text-align:right;
+  box-shadow: var(--shadow-sm);
 }
 .noteHeader {
   display:flex;
@@ -382,29 +457,40 @@ tbody tr:hover {
   bottom:0;
   left:0;
   right:0;
-  background:linear-gradient(90deg,#101722,#172231);
+  background:linear-gradient(90deg, #0d131d, #172231, #0d131d);
   border-top:1px solid #2e3d51;
   color:#94a3b8;
   text-align:center;
-  padding:8px 10px;
+  padding:9px 10px;
   font-size:12px;
   z-index:999;
-  backdrop-filter:blur(8px)
+  backdrop-filter:blur(10px);
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.65);
 }
 .footerBar strong { color:#d8bd83 }
 .footerBar a { color:#22c55e; text-decoration:none; font-weight:800 }
 
-/* === إضافات الحضور والغياب === */
 .badge { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:800; display:inline-block; min-width:55px }
-.badge-present { background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 2px 8px rgba(34,197,94,.3) }
-.badge-absent { background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; box-shadow:0 2px 8px rgba(239,68,68,.3) }
+.badge-present { background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; box-shadow:0 3px 10px rgba(34,197,94,.4) }
+.badge-absent { background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; box-shadow:0 3px 10px rgba(239,68,68,.4) }
 .badge-none { background:#1e293b; color:#94a3b8; border:1px solid #334155 }
 .donutWrap { display:flex; align-items:center; gap:14px; flex-wrap:wrap }
-.donut { width:110px; height:110px; border-radius:50%; position:relative; display:grid; place-items:center; flex-shrink:0 }
-.donutCenter { width:64px; height:64px; background:#101722; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:800; color:#cbd5e1; border:1px solid #2a3a4f }
+.donut { width:114px; height:114px; border-radius:50%; position:relative; display:grid; place-items:center; flex-shrink:0; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(0, 0, 0, 0.5); }
+.donutCenter { width:66px; height:66px; background:#0e1520; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:800; color:#cbd5e1; border:1px solid #2a3a4f; box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.7); }
 .statItem { display:flex; align-items:center; gap:6px; font-size:13px; margin:6px 0 }
-.statDot { width:10px; height:10px; border-radius:50%; display:inline-block }
-#attendanceDashboard { background:linear-gradient(135deg,#172231,#121b29); border:1px solid #2e3d51; border-radius:14px; padding:14px; margin:12px 0; display:grid; grid-template-columns:110px 1fr; gap:14px; align-items:center }
+.statDot { width:10px; height:10px; border-radius:50%; display:inline-block; box-shadow: 0 0 6px currentColor; }
+#attendanceDashboard {
+  background:linear-gradient(135deg, #172231, #101723);
+  border:1px solid #2e3d51;
+  border-radius:16px;
+  padding:16px;
+  margin:12px 0;
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:14px;
+  align-items:center;
+  box-shadow: var(--shadow-md);
+}
 
 @media(max-width:650px) {
   .wrap { padding:10px }
@@ -416,7 +502,7 @@ tbody tr:hover {
 @media print {
   @page { size:A4; margin:6mm }
   .no-print { display:none!important }
-  body { background:#fff; color:#000 }
+  body { background:#fff; color:#000; box-shadow:none }
 }
 </style>
 </head>
@@ -427,15 +513,15 @@ tbody tr:hover {
     <h2>الأمل للتدريب</h2>
     <input id="uName" placeholder="اليوزر">
     <input id="uPass" type="password" placeholder="الباسورد">
-    <button class="btn btn-gold" onclick="authLogin()">دخول</button>
-    <button class="btn btn-blue" onclick="authCreate()" style="margin-top:6px">إنشاء حساب جديد</button>
-    <div style="margin-top:10px"><input type="file" id="importAcc" accept=".json"></div>
+    <button class="btn btn-gold" id="btnLogin" onclick="authLogin()">دخول</button>
+    <button class="btn btn-blue" id="btnCreate" onclick="authCreate()" style="margin-top:6px">إنشاء حساب جديد</button>
+    <div id="loginStatus" style="text-align:center;font-size:12px;color:#94a3b8;margin-top:8px"></div>
   </div>
 </div>
 
 <div id="bigMsg"></div>
 <header id="mainTitle">الأمل للتدريب</header>
-<div id="userBar">غير مسجل</div>
+<div id="userBar">جاري الاتصال بالسحابة...</div>
 
 <div class="wrap">
   <div class="topBar no-print">
@@ -514,7 +600,7 @@ tbody tr:hover {
       <button class="btn btn-gold" style="flex:1;min-width:120px" onclick="printer.print24()">🖨️ طباعة 24 محدد</button>
     </div>
 
-    <div id="camWrap" style="display:none;margin-top:8px;position:relative;background:#000;border-radius:12px;overflow:hidden;border:2px solid var(--blue)">
+    <div id="camWrap" style="display:none;margin-top:8px;position:relative;background:#000;border-radius:12px;overflow:hidden;border:2px solid var(--blue);box-shadow:var(--shadow-md)">
       <video id="cam" playsinline style="width:100%;display:block;max-height:360px;object-fit:cover"></video>
       <div style="padding:8px;background:#0f1622;text-align:center">
         <button class="btn btn-red" style="max-width:220px;margin:auto" onclick="scanner.stop()">⏹️ إيقاف الكاميرا الآن</button>
@@ -568,18 +654,17 @@ tbody tr:hover {
       <button class="btn btn-green" style="flex:1;min-width:140px" onclick="report.exportExcel()">📊 تقرير الطالب Excel</button>
       <button class="btn btn-teal" style="flex:1;min-width:140px" onclick="report.exportWord()">📄 تقرير الطالب Word</button>
     </div>
-    <div id="repBox" style="background:#0f1622;border:1px solid #2e3c50;padding:12px;border-radius:10px">اختار طالب</div>
+    <div id="repBox" style="background:#0f1622;border:1px solid #2e3c50;padding:12px;border-radius:12px;box-shadow:var(--shadow-sm)">اختار طالب</div>
   </div>
 
   <!-- الأقساط -->
   <div id="fees" class="card">
     <h3>الأقساط</h3>
-    <div id="feeAlert" style="display:none;background:#2a0a0a;border:1px solid #5a1a1a;padding:10px;border-radius:10px;margin-bottom:8px"></div>
+    <div id="feeAlert" style="display:none;background:#2a0a0a;border:1px solid #5a1a1a;padding:10px;border-radius:10px;margin-bottom:8px;box-shadow:var(--shadow-sm)"></div>
     
     <label style="font-size:12px;color:#94a3b8">اختر الطالب (سيتم عرض إجمالي مصروفاته والمتبقي عليه تلقائياً)</label>
     <select id="feeStu" onchange="fees.onSelectStudent()"></select>
 
-    <!-- بطاقة حساب الرصيد التلقائي للطالب -->
     <div id="feeStuSummary" class="feeSummaryBox">
       <div style="font-size:12px;color:var(--gold);font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
         <span>💰 موقف سداد الطالب الحالي</span>
@@ -686,12 +771,12 @@ tbody tr:hover {
     <input id="s_dob" type="date">
     <textarea id="s_addr" placeholder="العنوان"></textarea>
     <input id="s_photo" type="file" accept="image/*">
-    <img id="s_prev" style="width:80px;height:80px;border-radius:50%;display:none;margin:8px auto;object-fit:cover;border:2px solid var(--gold)">
+    <img id="s_prev" style="width:80px;height:80px;border-radius:50%;display:none;margin:8px auto;object-fit:cover;border:2px solid var(--gold);box-shadow:0 4px 12px rgba(0,0,0,0.5)">
     <button class="btn btn-gold" onclick="student.save()">حفظ وتوليد الرمز</button>
   </div>
 </div>
 
-<!-- موديل إجراءات الطالب (بديل الثلاث نقط) -->
+<!-- موديل إجراءات الطالب -->
 <div id="stuActionModal" class="modal" onclick="if(event.target===this) actionModals.closeStu()">
   <div class="modalBox actionModalBox">
     <button class="closeX" onclick="actionModals.closeStu()">✕</button>
@@ -701,7 +786,7 @@ tbody tr:hover {
   </div>
 </div>
 
-<!-- موديل إجراءات القسط وسجل دفعات الطالب (بديل الثلاث نقط) -->
+<!-- موديل إجراءات القسط وسجل دفعات الطالب -->
 <div id="feeActionModal" class="modal" onclick="if(event.target===this) actionModals.closeFee()">
   <div class="modalBox actionModalBox">
     <button class="closeX" onclick="actionModals.closeFee()">✕</button>
@@ -732,60 +817,92 @@ tbody tr:hover {
 </div>
 
 <script>
-// 1- التخزين
-let USERS = {};
-try {
-  USERS = JSON.parse(localStorage.getItem('amal_users') || '{}');
-} catch {}
 let CUR = sessionStorage.getItem('amal_cur') || "";
 let DB = fresh();
 let tmpPhoto = "", picked = new Set();
 
 function fresh() {
   return {
+    pass: "1234",
     students: [],
     fees: [],
     attendance: [],
     notes: [],
-    lectures: { general: [], labs: [], nursing: [] },
-    settings: { name: "الأمل للتدريب", bg: "#0a0a0a", pass: "1234" }
+    settings: { name: "الأمل للتدريب", bg: "radial-gradient(circle at top center, #1e293b 0%, #090e17 65%, #04070c 100%)", pass: "1234" }
   };
 }
 
-function saveAll() {
-  if (!CUR) return;
-  USERS[CUR].data = DB;
-  localStorage.setItem('amal_users', JSON.stringify(USERS));
-  document.getElementById('userBar').textContent = "داخل: " + CUR;
+function waitForCloud() {
+  return new Promise(resolve => {
+    if (window.cloudDB) return resolve();
+    window.onFirebaseReady = () => resolve();
+  });
 }
 
-// 2- الدخول
-function authLogin() {
+async function saveAll() {
+  if (!CUR) return;
+  await waitForCloud();
+  document.getElementById('userBar').textContent = "⏳ جاري المزامنة مع السحابة...";
+  await window.cloudDB.saveUserData(CUR, { pass: DB.pass, data: DB });
+  document.getElementById('userBar').textContent = "☁️ متصل بالسحابة | المستخدم: " + CUR;
+}
+
+async function authLogin() {
   let u = document.getElementById('uName').value.trim(),
       p = document.getElementById('uPass').value.trim();
-  if (!USERS[u]) return alert("اليوزر مش موجود");
-  if (USERS[u].pass !== p) return alert("الباسورد غلط");
+  if (!u || !p) return alert("اكتب اليوزر والباسورد");
+  
+  const statusEl = document.getElementById('loginStatus');
+  statusEl.textContent = "⏳ جاري التحقق من السحابة...";
+  await waitForCloud();
+  
+  let remoteData = await window.cloudDB.getUserData(u);
+  statusEl.textContent = "";
+  if (!remoteData) return alert("اليوزر مش موجود في السحابة");
+  if (remoteData.pass !== p) return alert("الباسورد غلط");
+  
   CUR = u;
-  DB = USERS[u].data;
+  DB = remoteData.data || fresh();
+  DB.pass = remoteData.pass;
+  DB.students ||= [];
+  DB.fees ||= [];
+  DB.attendance ||= [];
   DB.notes ||= [];
+  DB.settings ||= fresh().settings;
   sessionStorage.setItem('amal_cur', u);
   hideLogin();
   app.applySet();
+  setDefaultFeeDateTime();
   app.render();
+  document.getElementById('userBar').textContent = "☁️ متصل بالسحابة | المستخدم: " + CUR;
 }
 
-function authCreate() {
+async function authCreate() {
   let u = document.getElementById('uName').value.trim(),
       p = document.getElementById('uPass').value.trim();
   if (!u || !p) return alert("اكتب يوزر وباسورد");
-  if (USERS[u]) return alert("موجود قبل كده");
-  USERS[u] = { pass: p, data: fresh() };
+
+  const statusEl = document.getElementById('loginStatus');
+  statusEl.textContent = "⏳ جاري إنشاء الحساب السحابي...";
+  await waitForCloud();
+
+  let remoteData = await window.cloudDB.getUserData(u);
+  if (remoteData) {
+    statusEl.textContent = "";
+    return alert("هذا اليوزر موجود مسبقاً في السحابة، اختر اسماً آخر أو قم بالدخول");
+  }
+
   CUR = u;
-  DB = USERS[u].data;
-  localStorage.setItem('amal_users', JSON.stringify(USERS));
+  DB = fresh();
+  DB.pass = p;
+  await window.cloudDB.saveUserData(u, { pass: p, data: DB });
+  statusEl.textContent = "";
   sessionStorage.setItem('amal_cur', u);
   hideLogin();
+  app.applySet();
+  setDefaultFeeDateTime();
   app.render();
+  document.getElementById('userBar').textContent = "☁️ متصل بالسحابة | المستخدم: " + CUR;
 }
 
 function authLogout() {
@@ -801,7 +918,6 @@ function hideLogin() {
   document.getElementById('loginScreen').style.display = 'none';
 }
 
-// 3- الواجهة
 const app = {
   go(id) {
     document.querySelectorAll('.card').forEach(card => card.classList.remove('active'));
@@ -819,17 +935,19 @@ const app = {
     else if (p) alert("غلط");
   },
   applySet() {
-    document.body.style.background = DB.settings.bg;
-    document.getElementById('mainTitle').textContent = DB.settings.name;
-    document.getElementById('setName').value = DB.settings.name;
-    document.getElementById('setBg').value = DB.settings.bg;
+    if (DB.settings.bg && !DB.settings.bg.includes('gradient')) {
+      document.body.style.background = DB.settings.bg;
+    }
+    document.getElementById('mainTitle').textContent = DB.settings.name || "الأمل للتدريب";
+    document.getElementById('setName').value = DB.settings.name || "الأمل للتدريب";
+    document.getElementById('setBg').value = (DB.settings.bg && DB.settings.bg.startsWith('#')) ? DB.settings.bg : "#090e17";
   },
-  saveSet() {
+  async saveSet() {
     DB.settings.name = document.getElementById('setName').value;
     DB.settings.bg = document.getElementById('setBg').value;
-    saveAll();
+    await saveAll();
     this.applySet();
-    alert("تم");
+    alert("تم الحفظ في السحابة بنجاح");
   },
   render() {
     drawDivs();
@@ -838,7 +956,6 @@ const app = {
   }
 };
 
-// 4- QR
 const qrUtil = {
   draw(el, code) {
     el.innerHTML = "";
@@ -869,7 +986,6 @@ function divLabel(v) {
   return v === 'general' ? 'شعبة عامة' : v === 'labs' ? 'تحاليل' : 'تمريض';
 }
 
-// 5- موديلات الإجراءات (بديل القائمة المنسدلة للثلاث نقط)
 const actionModals = {
   openStu(id) {
     const s = DB.students.find(x => x.id === id);
@@ -896,7 +1012,6 @@ const actionModals = {
     document.getElementById('feeActTitle').textContent = s.name;
     document.getElementById('feeActSub').textContent = `الإجمالي: ${info.total} | المدفوع: ${info.paid} | المتبقي: ${info.remaining}`;
     
-    // عرض سجل الدفعات الفردية لهذا الطالب مع إمكانية حذف دفعة معينة
     const historyHTML = info.records.map((r, idx) => `
       <div style="background:#0f172a;border:1px solid #2e3d51;border-radius:8px;padding:7px 10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px">
         <div>
@@ -922,7 +1037,6 @@ const actionModals = {
   }
 };
 
-// 6- الطالب
 const student = {
   open() {
     document.getElementById('editId').value = "";
@@ -959,7 +1073,7 @@ const student = {
     } else im.style.display = 'none';
     document.getElementById('stuModal').classList.add('open');
   },
-  save() {
+  async save() {
     let name = document.getElementById('s_name').value.trim(),
         div = document.getElementById('s_div').value;
     if (!name || !div) return alert("الاسم والشعبة مطلوبين");
@@ -985,33 +1099,45 @@ const student = {
       d.code = "AM" + Date.now().toString().slice(-6);
       DB.students.push(d);
     }
-    saveAll();
+    await saveAll();
     this.close();
     app.render();
   },
-  del(id) {
+  async del(id) {
     if (confirm("متأكد تحذف؟")) {
       DB.students = DB.students.filter(s => s.id !== id);
-      saveAll();
+      await saveAll();
       app.render();
     }
   }
 };
 
+// ضغط الصورة تلقائياً لتكون خفيفة وسريعة على السحابة
 document.getElementById('s_photo').addEventListener('change', e => {
   let f = e.target.files[0];
   if (!f) return;
   let r = new FileReader();
   r.onload = ev => {
-    tmpPhoto = ev.target.result;
-    let im = document.getElementById('s_prev');
-    im.src = tmpPhoto;
-    im.style.display = 'block';
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxSize = 200;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h *= maxSize / w; w = maxSize; } }
+      else { if (h > maxSize) { w *= maxSize / h; h = maxSize; } }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      tmpPhoto = canvas.toDataURL('image/jpeg', 0.75);
+      let im = document.getElementById('s_prev');
+      im.src = tmpPhoto;
+      im.style.display = 'block';
+    };
+    img.src = ev.target.result;
   };
   r.readAsDataURL(f);
 });
 
-// 7- الجداول والحضور
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function getTodayStatus(studentId) {
   const today = todayStr();
@@ -1103,7 +1229,7 @@ function drawAttendanceDashboard() {
 }
 
 const attendanceTools = {
-  markAllPresent() {
+  async markAllPresent() {
     if (!DB.students.length) return alert('لا يوجد طلاب');
     if (!confirm('تحضير كل الطلاب كـ حاضر اليوم؟')) return;
     const today = todayStr();
@@ -1111,14 +1237,14 @@ const attendanceTools = {
       DB.attendance = DB.attendance.filter(a => !(a.studentId === s.id && a.date === today));
       DB.attendance.push({ studentId: s.id, date: today, time: new Date().toLocaleTimeString('ar-EG'), status: 'present' });
     });
-    saveAll();
+    await saveAll();
     app.render();
   },
-  clearToday() {
+  async clearToday() {
     if (!confirm('مسح كل حضور وغياب اليوم؟')) return;
     const today = todayStr();
     DB.attendance = DB.attendance.filter(a => a.date !== today);
-    saveAll();
+    await saveAll();
     app.render();
   }
 };
@@ -1160,9 +1286,7 @@ function drawAffairs() {
     let o2 = document.createElement('option');
     o2.value = s.id;
     const sum = fees.getStudentSummary(s.id);
-    o2.textContent = sum.records.length
-      ? `${s.name} (الباقي: ${sum.remaining})`
-      : s.name;
+    o2.textContent = sum.records.length ? `${s.name} (الباقي: ${sum.remaining})` : s.name;
     fsel.appendChild(o2);
 
     let o3 = document.createElement('option');
@@ -1175,7 +1299,6 @@ function drawAffairs() {
   if (old3) nsel.value = old3;
 }
 
-// 8- الطباعة
 const printer = {
   one(code, name) {
     let w = window.open("", "_blank");
@@ -1214,8 +1337,7 @@ const printer = {
   }
 };
 
-// 9- حضور
-function attend(id, status) {
+async function attend(id, status) {
   let s = DB.students.find(x => x.id === id);
   if (!s) return;
   let today = new Date().toISOString().slice(0, 10);
@@ -1226,7 +1348,7 @@ function attend(id, status) {
     time: new Date().toLocaleTimeString('ar-EG'),
     status
   });
-  saveAll();
+  await saveAll();
   app.render();
   let bm = document.getElementById('bigMsg');
   bm.innerHTML = (status === 'present' ? 'حضر' : 'غاب') + "<br>" + escapeHTML(s.name);
@@ -1235,7 +1357,6 @@ function attend(id, status) {
   report.show();
 }
 
-// 10- الكاميرا وقراءة QR مع زرار إيقاف الكاميرا
 const scanner = {
   stream: null,
   async openCam() {
@@ -1298,7 +1419,6 @@ const scanner = {
   }
 };
 
-// 11- رفع صورة QR وقراءتها
 document.getElementById('qrFile').addEventListener('change', event => {
   const file = event.target.files[0];
   if (!file || !window.jsQR) return;
@@ -1320,7 +1440,6 @@ document.getElementById('qrFile').addEventListener('change', event => {
   event.target.value = '';
 });
 
-// أدوات الطباعة المشتركة
 function openPrintPage(title, content) {
   const win = window.open('', '_blank', 'width=900,height=700');
   if (!win) return alert('اسمح بفتح النوافذ المنبثقة حتى تتمكن من الطباعة.');
@@ -1330,7 +1449,6 @@ function openPrintPage(title, content) {
   win.document.close();
 }
 
-// 12- التصدير إلى Excel و Word بتقسيم جدول واضح لكل شيء
 const exporter = {
   cleanTableHTML(tableId) {
     const orig = document.getElementById(tableId);
@@ -1419,7 +1537,6 @@ const exporter = {
   }
 };
 
-// 13- التقارير
 const report = {
   getStudentReportData() {
     const id = Number(document.getElementById('repSel').value);
@@ -1514,7 +1631,6 @@ const report = {
   }
 };
 
-// 14- إدارة الأقساط الذكية (تجميع رصيد الطالب تلقائياً بدون تكرار سطور)
 function setDefaultFeeDateTime() {
   const now = new Date();
   const dateEl = document.getElementById('feeDate');
@@ -1528,13 +1644,11 @@ function setDefaultFeeDateTime() {
 }
 
 const fees = {
-  // حساب إجمالي مصروفات الطالب، إجمالي ما دفعه في كل المرات، والمتبقي عليه
   getStudentSummary(studentId) {
     const records = DB.fees.filter(item => Number(item.studentId) === Number(studentId));
     if (!records.length) {
       return { total: 0, paid: 0, remaining: 0, records: [], lastRecord: null };
     }
-    // نأخذ أحدث إجمالي مصروفات مسجل للطالب (في حال تم تعديله)
     const total = Number(records[records.length - 1].total) || 0;
     const paid = records.reduce((sum, item) => sum + (Number(item.paid) || 0), 0);
     const remaining = Math.max(0, total - paid);
@@ -1542,7 +1656,6 @@ const fees = {
     return { total, paid, remaining, records, lastRecord };
   },
 
-  // عند اختيار طالب من القائمة
   onSelectStudent() {
     const studentId = Number(document.getElementById('feeStu').value);
     const summaryBox = document.getElementById('feeStuSummary');
@@ -1562,7 +1675,6 @@ const fees = {
     summaryBox.style.display = 'block';
 
     if (info.records.length > 0) {
-      // الطالب مسجل له أقساط من قبل: نملأ الإجمالي تلقائياً ونعرض المتبقي
       totalInput.value = info.total;
       paidInput.value = '';
       document.getElementById('feeInstallmentsCount').textContent = `عدد الدفعات السابقة: ${info.records.length}`;
@@ -1572,7 +1684,6 @@ const fees = {
       document.getElementById('sumAfterRem').textContent = info.remaining.toLocaleString('ar-EG');
       remAutoInput.value = info.remaining + ' (المتبقي الحالي)';
     } else {
-      // طالب جديد ليس له أقساط سابقة
       totalInput.value = '';
       paidInput.value = '';
       document.getElementById('feeInstallmentsCount').textContent = 'أول دفعة للطالب';
@@ -1584,7 +1695,6 @@ const fees = {
     }
   },
 
-  // حساب المتبقي لحظياً أثناء الكتابة
   calcLive() {
     const studentId = Number(document.getElementById('feeStu').value);
     const total = Number(document.getElementById('feeTotal').value) || 0;
@@ -1609,7 +1719,7 @@ const fees = {
     }
   },
 
-  save() {
+  async save() {
     const studentId = Number(document.getElementById('feeStu').value);
     const total = Number(document.getElementById('feeTotal').value);
     const paid = Number(document.getElementById('feePaid').value);
@@ -1628,7 +1738,6 @@ const fees = {
       return alert(`المبلغ المدفوع (${paid}) + المدفوع سابقاً (${info.paid}) = ${info.paid + paid} وهو أكبر من إجمالي المصروفات (${total})! المتبقي على الطالب هو ${Math.max(0, total - info.paid)} فقط.`);
     }
 
-    // تحديث الإجمالي في السجلات السابقة لنفس الطالب إن تم تعديل الإجمالي
     DB.fees.forEach(item => {
       if (Number(item.studentId) === studentId) item.total = total;
     });
@@ -1642,7 +1751,7 @@ const fees = {
       time
     });
 
-    saveAll();
+    await saveAll();
     document.getElementById('feePaid').value = '';
     setDefaultFeeDateTime();
     app.render();
@@ -1709,10 +1818,10 @@ const fees = {
     );
   },
 
-  delOne(feeId, studentId) {
+  async delOne(feeId, studentId) {
     if (!confirm('هل تريد حذف هذه الدفعة فقط؟')) return;
     DB.fees = DB.fees.filter(item => item.id !== feeId);
-    saveAll();
+    await saveAll();
     app.render();
     this.onSelectStudent();
     if (DB.fees.some(item => Number(item.studentId) === Number(studentId))) {
@@ -1722,16 +1831,15 @@ const fees = {
     }
   },
 
-  delAllForStudent(studentId) {
+  async delAllForStudent(studentId) {
     if (!confirm('هل تريد حذف جميع دفعات وأقساط هذا الطالب؟')) return;
     DB.fees = DB.fees.filter(item => Number(item.studentId) !== Number(studentId));
-    saveAll();
+    await saveAll();
     app.render();
     this.onSelectStudent();
   }
 };
 
-// رسم جدول الأقساط بحيث يظهر كل طالب في صف واحد موحد بإجمالي المدفوع والمتبقي
 function drawFees() {
   const body = document.getElementById('tb_fees');
   if (!body) return;
@@ -1740,7 +1848,6 @@ function drawFees() {
   let overdueStudents = 0;
   let rowIndex = 0;
 
-  // تجميع الطلاب الذين لديهم أقساط مسجلة (بدون تكرار الصفوف)
   const studentIdsWithFees = [...new Set(DB.fees.map(f => Number(f.studentId)))];
 
   studentIdsWithFees.forEach(studentId => {
@@ -1775,7 +1882,6 @@ function drawFees() {
   alertBox.textContent = overdueStudents ? `يوجد ${overdueStudents} طالب/طلاب عليهم مبالغ متبقية.` : '';
 }
 
-// 15- موديل ملاحظات الطلاب
 const notesModal = {
   open(preselectStudentId) {
     DB.notes ||= [];
@@ -1788,7 +1894,7 @@ const notesModal = {
   close() {
     document.getElementById('notesModal').classList.remove('open');
   },
-  save() {
+  async save() {
     const studentId = Number(document.getElementById('noteStuSel').value);
     const text = document.getElementById('noteText').value.trim();
     if (!studentId) return alert('اختر الطالب أولاً');
@@ -1801,15 +1907,15 @@ const notesModal = {
       date: new Date().toLocaleDateString('ar-EG'),
       time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
     });
-    saveAll();
+    await saveAll();
     document.getElementById('noteText').value = '';
     this.renderList();
     report.show();
   },
-  del(id) {
+  async del(id) {
     if (!confirm('حذف هذه الملاحظة؟')) return;
     DB.notes = (DB.notes || []).filter(n => n.id !== id);
-    saveAll();
+    await saveAll();
     this.renderList();
     report.show();
   },
@@ -1854,26 +1960,6 @@ const notesModal = {
   }
 };
 
-// 16- استيراد الحسابات
-document.getElementById('importAcc').addEventListener('change', event => {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const imported = JSON.parse(reader.result);
-      if (!imported || typeof imported !== 'object' || Array.isArray(imported)) throw new Error('invalid');
-      USERS = { ...USERS, ...imported };
-      localStorage.setItem('amal_users', JSON.stringify(USERS));
-      alert('تم استيراد الحسابات بنجاح');
-    } catch {
-      alert('ملف النسخة الاحتياطية غير صالح');
-    }
-  };
-  reader.readAsText(file);
-});
-
-// 17- أدوات مساعدة وتهيئة التطبيق
 function escapeHTML(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -1893,24 +1979,31 @@ document.addEventListener('keydown', event => {
   }
 });
 
-// بدء التشغيل واستعادة الجلسة عند وجودها
-(function initializeApp() {
-  if (CUR && USERS[CUR]?.data) {
-    DB = USERS[CUR].data;
-    DB.students ||= [];
-    DB.fees ||= [];
-    DB.attendance ||= [];
-    DB.notes ||= [];
-    DB.settings ||= fresh().settings;
-    hideLogin();
-    app.applySet();
-    setDefaultFeeDateTime();
-    app.render();
-  } else {
-    CUR = '';
-    sessionStorage.removeItem('amal_cur');
-    document.getElementById('loginScreen').style.display = 'flex';
+// استعادة الجلسة تلقائياً عند فتح الصفحة
+(async function initializeApp() {
+  if (CUR) {
+    await waitForCloud();
+    let remoteData = await window.cloudDB.getUserData(CUR);
+    if (remoteData) {
+      DB = remoteData.data || fresh();
+      DB.pass = remoteData.pass;
+      DB.students ||= [];
+      DB.fees ||= [];
+      DB.attendance ||= [];
+      DB.notes ||= [];
+      DB.settings ||= fresh().settings;
+      hideLogin();
+      app.applySet();
+      setDefaultFeeDateTime();
+      app.render();
+      document.getElementById('userBar').textContent = "☁️ متصل بالسحابة | المستخدم: " + CUR;
+      return;
+    }
   }
+  CUR = '';
+  sessionStorage.removeItem('amal_cur');
+  document.getElementById('userBar').textContent = "غير مسجل";
+  document.getElementById('loginScreen').style.display = 'flex';
 })();
 </script>
 
